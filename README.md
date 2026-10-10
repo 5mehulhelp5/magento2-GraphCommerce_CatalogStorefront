@@ -259,6 +259,7 @@ Stores > Configuration > Catalog > Catalog > Catalog Storefront Document Store:
 | `catalog/storefront_documents/serve_graphql` | 0, per store view | The catalog GraphQL reads come from documents. |
 | `catalog/storefront_documents/serve_plp` | 0, per store view | Rendered category and search listing pages build their products from documents. |
 | `catalog/storefront_documents/serve_pdp` | 0, per store view | A rendered product detail page takes its product from a document. |
+| `catalog/storefront_documents/cache_category_pages` | 1, per store view | 0 keeps category pages out of the page cache, Varnish and built-in alike: every visit renders the page. Flush the page cache after a change. |
 | `catalog/storefront_documents/key` | Generated on a save with the field empty | The value of the `X-Catalog-Storefront-Key` header that unlocks the path header and the fallback report. |
 | `catalog/storefront_documents/index_prefix` | `catalog_storefront` | The first part of every index name. |
 
