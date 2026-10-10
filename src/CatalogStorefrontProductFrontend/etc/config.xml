@@ -5,6 +5,7 @@
             <storefront_documents>
                 <serve_plp>0</serve_plp>
                 <serve_pdp>0</serve_pdp>
+                <cache_category_pages>1</cache_category_pages>
             </storefront_documents>
         </catalog>
     </default>

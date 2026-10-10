@@ -38,8 +38,11 @@ under Catalog > Catalog > Catalog Storefront Document Store:
   options and selections. [`GroupedProductFrontend`](../CatalogStorefrontGroupedProductFrontend)
   supplies grouped children and quantity validation. Both modules require the product and stock feeds.
 - `X-Catalog-Storefront: documents|core` under the storefront key picks the path per
-  request. [`Plugin/KeyedPageUncacheable`](Plugin/KeyedPageUncacheable.php) disables full-page
+  request. [`Plugin/PageCacheOff`](Plugin/PageCacheOff.php) disables full-page
   caching for these requests, so each parity check renders the selected reader.
+- `catalog/storefront_documents/cache_category_pages` (on by default, per store view) set to
+  0 keeps category pages out of the page cache, Varnish and built-in alike, through the same
+  plugin: every visit renders the page, and the blocks Varnish includes by ESI render inline.
 
 Two gates render both paths and compare them line by line, with the form key, the uniqid
 element id suffixes and the private content stamps normalised:

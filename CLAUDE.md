@@ -224,7 +224,9 @@ passes.
   pages from documents, for a Luma or Hyvä theme, off by default
   (`Model/Mode`: the store view's Serve Product Listings setting, or the
   `X-Catalog-Storefront` header under the key, which is part of the page cache
-  id so a keyed request never fills a visitor's slot). `Plugin/Listing/
+  id so a keyed request never fills a visitor's slot). `Plugin/PageCacheOff`
+  turns the page cache off for a keyed request and, under the store view's Cache
+  Category Pages setting, for a category page. `Plugin/Listing/
   CollectionFlag` marks the collection the layer's item collection provider
   returns (ElasticSuite's category layer is a virtual type of it), and
   `ListingHydration` wraps the entity load of a marked collection only, so

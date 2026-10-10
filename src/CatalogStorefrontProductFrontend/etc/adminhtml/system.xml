@@ -13,6 +13,11 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Per store view: a product detail page takes its product from a document, so a configurable builds its variants, its options and its price without a query. The product itself still loads from the database, and a product missing from the document store renders entirely from it, so output does not change.</comment>
                 </field>
+                <field id="cache_category_pages" translate="label comment" type="select" sortOrder="37" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cache Category Pages</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Per store view: No keeps category pages out of the page cache, Varnish and built-in alike, so every visit renders the page and the blocks Varnish includes by ESI. Flush the page cache after a change, because a page stored before it is served until it expires.</comment>
+                </field>
             </group>
         </section>
     </system>

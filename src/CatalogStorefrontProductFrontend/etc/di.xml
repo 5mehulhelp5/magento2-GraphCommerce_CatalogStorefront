@@ -70,8 +70,8 @@
     </type>
 
     <type name="Magento\PageCache\Model\Config">
-        <plugin name="graphcommerce_catalog_storefront_keyed_page_uncacheable"
-                type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\KeyedPageUncacheable"/>
+        <plugin name="graphcommerce_catalog_storefront_page_cache_off"
+                type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\PageCacheOff"/>
     </type>
 
     <!--
