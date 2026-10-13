@@ -110,10 +110,11 @@ passes.
 - `CatalogStorefrontGraphQl`: `DocumentHydration`
   with the prefiller list, the two fields of `etc/schema.graphqls` (the only schema the
   package adds besides the swatch module's): `custom_attributeV2(attribute_code)`, the entry
-  of the unfiltered `custom_attributesV2` list, and an attribute value's `attribute`
-  (`Model/Resolver/AttributeValueMetadata` on core's attribute data providers,
-  `Plugin/Resolver/AttributeValueMetadataFromDocuments` from the attribute document through
-  `Model/AttributeMetadata`, which `attributesList` shares), `Model/Query/PageSizeLimit` (a page over 2 000
+  of the unfiltered `custom_attributesV2` list, and the `attribute` of an attribute value
+  and of an aggregation (`Model/Resolver/AttributeValueMetadata` on core's attribute data
+  providers, `Plugin/Resolver/AttributeValueMetadataFromDocuments` from the attribute
+  document through `Model/AttributeMetadata`, which `attributesList` shares; an aggregation
+  reads the primed facet documents, a category aggregation answers null), `Model/Query/PageSizeLimit` (a page over 2 000
   items is refused on both paths, in the argument validator every resolver
   passes: a full document decodes to about 65 KB, 10 000 of them hold 650 MB,
   and core's own GraphQL page size limit is not wired in Mage-OS; a source

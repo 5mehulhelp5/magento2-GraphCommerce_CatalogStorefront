@@ -9,6 +9,7 @@ use GraphCommerce\CatalogStorefront\Model\Read\AttributeDocuments;
 use GraphCommerce\CatalogStorefront\Model\Strict;
 use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\AttributeMetadata;
+use GraphCommerce\CatalogStorefrontGraphQl\Model\Read\FacetDocuments;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\Resolver\AttributeValueMetadata;
 use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeValueMetadataFromDocuments;
 use Magento\Framework\GraphQl\Config\Element\Field;
@@ -27,7 +28,7 @@ class AttributeValueMetadataFromDocumentsTest extends TestCase
         'options' => [['id' => '92', 'label' => 'Round']],
     ];
 
-    private function resolve(bool $documents, array $value, array $byCodes = []): mixed
+    private function resolve(bool $documents, array $value, array $byCodes = [], ?array $primed = null): mixed
     {
         $store = $this->createStub(StoreInterface::class);
         $store->method('getCode')->willReturn('default');
@@ -41,10 +42,13 @@ class AttributeValueMetadataFromDocumentsTest extends TestCase
         $attributeDocuments->method('byCodes')->willReturnCallback(
             static fn(string $store, array $codes): array => array_intersect_key($byCodes, array_flip($codes))
         );
+        $facets = $this->createStub(FacetDocuments::class);
+        $facets->method('attributes')->willReturn($primed);
         $enums = $this->createStub(EnumLookup::class);
         $enums->method('getEnumValueFromField')->willReturnCallback(static fn(string $enum, string $input) => strtoupper($input));
         $plugin = new AttributeValueMetadataFromDocuments(
             $attributeDocuments,
+            $facets,
             new AttributeMetadata($enums),
             $mode,
             new Strict($this->createStub(StorefrontKey::class), $this->createStub(LoggerInterface::class))
@@ -81,5 +85,13 @@ class AttributeValueMetadataFromDocumentsTest extends TestCase
     {
         $this->expectException(DocumentReadException::class);
         $this->resolve(true, ['entity_type' => 'catalog_product', 'code' => 'shape']);
+    }
+
+    public function testAnAggregationTakesThePrimedFacetDocumentAndACategoryAggregationAnswersNull(): void
+    {
+        $metadata = $this->resolve(true, ['attribute_code' => 'shape', 'label' => 'Shape', 'options' => []], [], ['shape' => self::SHAPE]);
+        self::assertSame('shape', $metadata['code']);
+
+        self::assertNull($this->resolve(true, ['attribute_code' => 'category_uid', 'options' => []], [], ['shape' => self::SHAPE]));
     }
 }

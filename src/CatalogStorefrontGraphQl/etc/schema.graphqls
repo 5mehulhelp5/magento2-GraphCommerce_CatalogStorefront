@@ -5,3 +5,7 @@ interface ProductInterface {
 interface AttributeValueInterface {
     attribute: CustomAttributeMetadataInterface @doc(description: "The metadata of the attribute, as customAttributeMetadataV2 returns it.") @resolver(class: "GraphCommerce\\CatalogStorefrontGraphQl\\Model\\Resolver\\AttributeValueMetadata")
 }
+
+type Aggregation {
+    attribute: CustomAttributeMetadataInterface @doc(description: "The metadata of the aggregated attribute, as customAttributeMetadataV2 returns it, or null for a category aggregation.") @resolver(class: "GraphCommerce\\CatalogStorefrontGraphQl\\Model\\Resolver\\AttributeValueMetadata")
+}

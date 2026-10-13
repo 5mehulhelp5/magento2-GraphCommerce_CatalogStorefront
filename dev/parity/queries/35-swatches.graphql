@@ -10,6 +10,23 @@ fragment Swatch on SwatchDataInterface {
   products(filter: { sku: { in: [{{skus:any:swatch:6}}] } }) {
     aggregations {
       attribute_code
+      attribute {
+        code
+        label
+        frontend_input
+        entity_type
+        ... on CatalogAttributeMetadata {
+          is_filterable
+          is_filterable_in_search
+          swatch_input_type
+        }
+        options {
+          value
+          swatch {
+            ...Swatch
+          }
+        }
+      }
       options {
         value
         label

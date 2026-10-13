@@ -222,7 +222,7 @@ runs core alone.
 | `products` search, filter and sort | `...GraphQl` | every selected product |
 | `categories`, `categoryList`, a product's `categories` | `...GraphQl` | supported category filters and page bounds |
 | `aggregations`, layered navigation labels, price step | `...GraphQl`, base | store attributes and selected categories |
-| `custom_attributesV2`, `custom_attributeV2`, `attributesList`, the `attribute` of a value | `...GraphQl` | supported attribute filters, the attribute document of the code |
+| `custom_attributesV2`, `custom_attributeV2`, `attributesList`, the `attribute` of a value or an aggregation | `...GraphQl` | supported attribute filters, the attribute document of the code |
 | `swatch` of an aggregation option, an attribute option and a selected option | `...SwatchesGraphQl` | the attribute documents |
 | `media_gallery`, `url_rewrites` | `...GraphQl` | media URLs and URL rewrites |
 | `related_products`, `upsell_products`, `crosssell_products` | `...GraphQl` | linked products |
@@ -247,12 +247,13 @@ parity gate compares both paths (`dev/parity/queries/34-*` and `35-*`).
 | Field | Module | Answers |
 | --- | --- | --- |
 | `ProductInterface.custom_attributeV2(attribute_code)` | `...GraphQl` | The entry of `custom_attributesV2` with that code, or null |
-| `AttributeValueInterface.attribute` | `...GraphQl` | The attribute metadata, as `customAttributeMetadataV2` returns it |
+| `AttributeValueInterface.attribute`, `Aggregation.attribute` | `...GraphQl` | The attribute metadata, as `customAttributeMetadataV2` returns it; null for a category aggregation |
 | `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `...SwatchesGraphQl` | The `SwatchDataInterface` of an option of a swatch attribute, or null |
 
 The fields have the names and arguments of GraphCommerce's mesh extension
 (`packages/magento-graphql/schema`), so a storefront drops its mesh resolvers and their
-`customAttributeMetadataV2` call per attribute.
+`customAttributeMetadataV2` call per attribute. `Aggregation.attribute` gives a filter its
+`frontend_input` and swatch type, where a storefront otherwise asks `attributesList`.
 
 ## Reference
 
