@@ -46,6 +46,7 @@ class Definition
                 'protection' => ['label' => 'Protection','element' => 'select','options' => ['public' => 'Public','private' => 'Private'],'default' => 'public'],
                 'book_mode' => ['label' => 'Price Book Selection','element' => 'select','options' => ['all' => 'All available books','selected' => 'Selected books','single' => 'Single book'],'default' => 'all'],
                 'book_ids' => ['label' => 'Price Books','element' => 'multiselect','options' => 'books'],
+                'reference_book_ids' => ['label' => 'Reference Price Books','element' => 'multiselect','options' => 'books','notice' => 'Books whose prices a product shows next to the selected Book. Filtering, sorting and facets use the selected Book only.'],
                 'layer_ids' => ['label' => 'Layers in Resolution Order','element' => 'ordered','options' => 'layers'],
                 'policy_ids' => ['label' => 'Catalog Policies','element' => 'multiselect','options' => 'policies'],
                 'native_store_id' => $nativeStore + ['types' => ['platform_store_view'],'required' => true],

@@ -27,7 +27,7 @@ define(['Magento_Ui/js/form/components/fieldset', 'uiRegistry', 'jquery', 'mage/
                 if (this.resourceKind === 'views') {
                     nativeView = f.type.value() === 'platform_store_view';
                     f.type.disabled(!this.editable || this.resourceId > 0);
-                    ['enabled', 'name', 'code', 'source_id', 'stock_id', 'protection', 'book_mode', 'book_ids', 'book_id', 'layer_ids', 'policy_ids'].forEach(function (name) { f[name].visible(!nativeView); });
+                    ['enabled', 'name', 'code', 'source_id', 'stock_id', 'protection', 'book_mode', 'book_ids', 'book_id', 'reference_book_ids', 'layer_ids', 'policy_ids'].forEach(function (name) { f[name].visible(!nativeView); });
                     f.native_store_id.visible(nativeView);
                     if (!nativeView) {
                         privateView = f.protection.value() === 'private';
