@@ -1,0 +1,21 @@
+# stock_sources: the source items of the enabled sources of the website's stock, in priority order.
+query {
+  products(filter: { sku: { in: [{{skus:simple:6}}, "{{sku:configurable}}", "{{sku:simple:child}}"] } }, sort: { name: ASC }) {
+    items {
+      __typename
+      sku
+      stock_sources {
+        source_code
+        name
+        quantity
+        in_stock
+        is_pickup_location
+        latitude
+        longitude
+        postcode
+        city
+        country_code
+      }
+    }
+  }
+}

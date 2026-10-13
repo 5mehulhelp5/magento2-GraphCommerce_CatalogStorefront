@@ -16,7 +16,8 @@ use Magento\InventoryConfigurationApi\Model\IsSourceItemManagementAllowedForProd
  * most the configured threshold; only product types with their own source
  * items have one), quantity (null when the not-available message hides it),
  * min_sale_qty and max_sale_qty (the slice carries the item's own values,
- * null where it takes the configured one).
+ * null where it takes the configured one), stock_sources (the source items of
+ * the slice, empty without a slice).
  */
 class Stock implements PrefillerInterface
 {
@@ -31,7 +32,7 @@ class Stock implements PrefillerInterface
 
     public function fill(array $models, array $documents, PrefillRequest $request): array
     {
-        if (!$request->selects('stock_status', 'only_x_left_in_stock', 'quantity', 'min_sale_qty', 'max_sale_qty')) {
+        if (!$request->selects('stock_status', 'only_x_left_in_stock', 'quantity', 'min_sale_qty', 'max_sale_qty', 'stock_sources')) {
             return [];
         }
         $storeId = (int)$request->store->getId();
@@ -65,6 +66,20 @@ class Stock implements PrefillerInterface
             }
             if ($request->selects('max_sale_qty')) {
                 $filled['max_sale_qty'] = (float)($stock['maxSaleQty'] ?? $this->stockConfiguration->getMaxSaleQty($storeId));
+            }
+            if ($request->selects('stock_sources')) {
+                $filled['stock_sources'] = array_map(static fn(array $source) => [
+                    'source_code' => $source['sourceCode'],
+                    'name' => $source['name'],
+                    'quantity' => (float)$source['quantity'],
+                    'in_stock' => (bool)$source['inStock'],
+                    'is_pickup_location' => (bool)($source['pickupLocation'] ?? false),
+                    'latitude' => $source['latitude'] ?? null,
+                    'longitude' => $source['longitude'] ?? null,
+                    'postcode' => $source['postcode'] ?? null,
+                    'city' => $source['city'] ?? null,
+                    'country_code' => $source['countryCode'] ?? null,
+                ], (array)($stock['sources'] ?? []));
             }
             $output[$id] = $filled;
         }
