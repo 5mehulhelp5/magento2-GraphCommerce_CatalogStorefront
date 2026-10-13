@@ -221,7 +221,9 @@ passes.
 - `CatalogStorefrontConfigurableProduct` / `...ConfigurableProductGraphQl`: the
   variants writer, the option value details patch-up, the configurable range /
   the configurable options document field (a GraphQL shape stored at index
-  time), the variants, options and options selection resolvers.
+  time), the variants, options and options selection resolvers (`followFilters` selects from
+  GraphQL Catalog's `ActiveFilters` over the variant documents, sort order 10 before the core
+  plugin's 20).
 - `CatalogStorefrontBundleProduct` / `...BundleProductGraphQl`: the bundle
   attribute feed fields, the bundle range / the price_details prefiller, the
   bundle items resolver.
@@ -343,7 +345,7 @@ registers all modules through composer autoload.
   a query that errors on either path. A query file names its products and
   categories through placeholders (`{{sku:configurable}}`, `{{skus:any:6}}`,
   `{{url_key:configurable}}`, `{{category_id:simple:special-price}}`,
-  `{{category_url_path:any}}`, `{{option_uid:configurable}}`,
+  `{{category_url_path:any}}`, `{{option_uid:configurable}}`, `{{option_filter:configurable}}`,
   `{{search_term}}`, `{{cart_id}}`), which
   `CatalogStorefrontGraphQl/Model/Parity/Picks` fills from the catalog of the
   installation, so the set runs on any catalog and a query the catalog cannot

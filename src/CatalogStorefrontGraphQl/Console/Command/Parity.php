@@ -34,6 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  * `{{category_url_path:<kind>}}`, `{{option_uid:<kind>}}` (the first option
  * of the first super attribute of that configurable product, or
  * `{{option_uid:<attribute code>:<admin label>}}` for a named one),
+ * `{{option_filter:<kind>}}` (a products filter entry on the lowest option of
+ * the first filterable super attribute of that configurable product),
  * `{{search_term}}` and `{{cart_id}}` (a guest cart the run creates on the
  * reference endpoint with two of the first simple product, a child of a
  * configurable one where none is visible). A query whose placeholder
@@ -583,6 +585,7 @@ class Parity extends Command
                     'category_id' => $this->picks->categoryId($kind),
                     'category_url_path' => $this->picks->categoryUrlPath($kind),
                     'option_uid' => str_contains($argument, ':') ? $this->namedOptionUid($argument) : $this->picks->optionUid($kind),
+                    'option_filter' => $this->picks->optionFilter($kind),
                     'search_term' => $this->picks->searchTerm(),
                     'currency' => $this->picks->currency(),
                     'cart_id' => $this->cartId ??= $this->cartId($endpoint, $key, $headers),
@@ -832,7 +835,8 @@ class Parity extends Command
             if ($key === 'adjustments' && is_array($child)) {
                 $node[$key] = array_values(array_filter($child, static fn($adjustment) => abs((float)($adjustment['amount']['value'] ?? 0)) >= 0.000001));
             }
-            if ($key === 'configurable_product_options_selection' && is_array($child['media_gallery'] ?? null)) {
+            if (($key === 'configurable_product_options_selection' || ($child['__typename'] ?? null) === 'ConfigurableProductOptionsSelection')
+                && is_array($child['media_gallery'] ?? null)) {
                 usort($child['media_gallery'], static fn($a, $b) => ($a['url'] ?? '') <=> ($b['url'] ?? ''));
                 $node[$key] = $child;
             }

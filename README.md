@@ -253,6 +253,7 @@ answer, and the parity gate compares both paths (`dev/parity/queries/34-*` and `
 | `ProductInterface.custom_attributeV2(attribute_code)` | `GraphQlCatalog` | `...GraphQl` (the `custom_attributesV2` plugin) |
 | `AttributeValueInterface.attribute`, `Aggregation.attribute` | `GraphQlCatalog` | `...GraphQl` |
 | `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `GraphQlCatalogSwatches` | `...Swatches` / `...SwatchesGraphQl` |
+| `configurable_product_options_selection(followFilters)` | `GraphQlCatalogConfigurableProduct` | `...ConfigurableProductGraphQl` (the selection plugin, over the variant documents) |
 
 ## Reference
 
