@@ -34,9 +34,25 @@
             <using field="productId"/>
             <using field="stockId"/>
         </field>
+        <field name="sources" type="StockItemSource" repeated="true" provider="GraphCommerce\CatalogStorefrontInventory\Model\DataExporter\Provider\StockSources">
+            <using field="sku"/>
+            <using field="stockId"/>
+        </field>
         <field name="websiteCodes" type="String" repeated="true" provider="GraphCommerce\CatalogStorefrontInventory\Model\DataExporter\Provider\StockWebsites">
             <using field="productId"/>
             <using field="stockId"/>
         </field>
+    </record>
+    <record name="StockItemSource">
+        <field name="sourceCode" type="String"/>
+        <field name="name" type="String"/>
+        <field name="quantity" type="Float"/>
+        <field name="inStock" type="Boolean"/>
+        <field name="pickupLocation" type="Boolean"/>
+        <field name="latitude" type="Float"/>
+        <field name="longitude" type="Float"/>
+        <field name="postcode" type="String"/>
+        <field name="city" type="String"/>
+        <field name="countryCode" type="String"/>
     </record>
 </config>

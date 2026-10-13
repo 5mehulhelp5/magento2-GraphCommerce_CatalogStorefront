@@ -16,6 +16,7 @@
                     <item name="quantity" xsi:type="string">quantity</item>
                     <item name="min_sale_qty" xsi:type="string">min_sale_qty</item>
                     <item name="max_sale_qty" xsi:type="string">max_sale_qty</item>
+                    <item name="stock_sources" xsi:type="string">stock_sources</item>
                 </item>
             </argument>
         </arguments>

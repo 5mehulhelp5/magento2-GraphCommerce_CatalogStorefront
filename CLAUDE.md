@@ -216,8 +216,11 @@ passes.
   paths) are printed and fail no query.
 - `CatalogStorefrontInventory` / `...InventoryGraphQl`: the stock feed writer
   (a stock's rows land on the store views of the websites it sells through)
-  and stock item feed fields / the stock prefiller (the MSI source item
-  management service says which types own a quantity).
+  and stock item feed fields, the source items of the stock per row
+  (`Provider/StockSources`: enabled sources in priority order with the physical
+  quantity and the location) / the stock prefiller (the MSI source item
+  management service says which types own a quantity; `stock_sources` from the
+  slice's `sources`).
 - `CatalogStorefrontConfigurableProduct` / `...ConfigurableProductGraphQl`: the
   variants writer, the option value details patch-up, the configurable range /
   the configurable options document field (a GraphQL shape stored at index
@@ -828,7 +831,10 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   sources); core reads the legacy stock status, the default source only. A
   composite on the default stock has no stock slice (no source items), so its
   salability is the products feed's `inStock` from Magento_CatalogInventoryDataExporter,
-  which the root package requires for that reason.
+  which the root package requires for that reason. `stock_sources` is the
+  physical quantity per source (reservations count on the stock only); the
+  source name and location travel on the stock feed row, so a source edit
+  shows after the next export of the rows of its skus.
   `min_sale_qty` and `max_sale_qty` resolve the configured value without a
   customer group, as core's resolvers do. `custom_attributesV2` falls back to
   core for a filter on a property the attribute documents lack

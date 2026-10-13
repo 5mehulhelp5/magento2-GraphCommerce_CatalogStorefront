@@ -254,6 +254,7 @@ answer, and the parity gate compares both paths (`dev/parity/queries/34-*` and `
 | `AttributeValueInterface.attribute`, `Aggregation.attribute` | `GraphQlCatalog` | `...GraphQl` |
 | `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `GraphQlCatalogSwatches` | `...Swatches` / `...SwatchesGraphQl` |
 | `configurable_product_options_selection(followFilters)` | `GraphQlCatalogConfigurableProduct` | `...ConfigurableProductGraphQl` (the selection plugin, over the variant documents) |
+| `stock_sources` | `GraphQlCatalogInventory` | `...Inventory` (the `sources` of the stock feed row) / `...InventoryGraphQl` (the stock prefiller) |
 
 ## Reference
 
