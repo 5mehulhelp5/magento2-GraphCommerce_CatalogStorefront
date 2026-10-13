@@ -4,6 +4,7 @@
         <sequence>
             <module name="GraphCommerce_CatalogStorefront"/>
             <module name="GraphCommerce_CatalogStorefrontGraphQlApi"/>
+            <module name="GraphCommerce_GraphQlCatalog"/>
             <module name="Magento_CatalogGraphQl"/>
             <module name="Magento_CatalogInventory"/>
             <module name="Magento_GraphQlCache"/>

@@ -59,8 +59,8 @@
     <type name="Magento\EavGraphQl\Model\Resolver\AttributesList">
         <plugin name="graphcommerce_catalog_storefront_attributes_list" type="GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributesListFromDocuments"/>
     </type>
-    <type name="GraphCommerce\CatalogStorefrontGraphQl\Model\Resolver\AttributeValueMetadata">
-        <plugin name="graphcommerce_catalog_storefront_attribute_value_metadata" type="GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeValueMetadataFromDocuments"/>
+    <type name="GraphCommerce\GraphQlCatalog\Model\Resolver\Attribute">
+        <plugin name="graphcommerce_catalog_storefront_attribute" type="GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeFromDocuments"/>
     </type>
     <type name="Magento\EavGraphQl\Model\TypeResolver\AttributeValue">
         <plugin name="graphcommerce_catalog_storefront_attribute_value_type" type="GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeValueTypeFromDocument"/>

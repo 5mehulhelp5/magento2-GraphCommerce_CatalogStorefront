@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace GraphCommerce\CatalogStorefrontGraphQl\Model;
 
-use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
+use GraphCommerce\GraphQlCatalog\Model\OptionSwatch;
 use Magento\Framework\GraphQl\Query\EnumLookup;
 
 /**
  * A product attribute document in the shape core's attribute data providers give a
  * CustomAttributeMetadataInterface value. An option carries its document swatch under
- * the prefiller key, so the swatch field reads no table.
+ * OptionSwatch::KEY, so the swatch field reads no table.
  */
 class AttributeMetadata
 {
@@ -46,7 +46,7 @@ class AttributeMetadata
                 'label' => $label,
                 'value' => $optionValue,
                 'is_default' => $default && in_array($optionValue, explode(',', $default), true),
-                PrefillerInterface::KEY => ['swatch' => $option['swatch'] ?? null],
+                OptionSwatch::KEY => $option['swatch'] ?? null,
             ];
         }
         $input = $document['frontendInput'] ?? null;

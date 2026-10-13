@@ -1,15 +1,13 @@
 {
     "name": "graphcommerce/module-catalog-storefront-swatches-graph-ql",
-    "description": "The swatch of an aggregation option, an attribute option and a selected option, from the attribute documents of the catalog read model",
+    "description": "The swatch of an aggregation option, an attribute option and a selected option from the attribute documents of the catalog read model",
     "type": "magento2-module",
     "license": "MIT",
     "require": {
         "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
         "magento/framework": "*",
         "magento/module-catalog-graph-ql": "*",
-        "magento/module-eav-graph-ql": "*",
-        "magento/module-swatches": "*",
-        "magento/module-swatches-graph-ql": "*",
+        "graphcommerce/module-graph-ql-catalog-swatches": "*",
         "graphcommerce/module-catalog-storefront-graph-ql": "self.version",
         "graphcommerce/module-catalog-storefront-swatches": "self.version"
     },

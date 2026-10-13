@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver;
 
+use GraphCommerce\GraphQlCatalog\Model\OptionSwatch;
 use GraphCommerce\CatalogStorefront\Model\Read\AttributeDocuments;
 use GraphCommerce\CatalogStorefrontGraphQlApi\Read\HydrationInterface;
-use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Model\FilterProductCustomAttribute;
 use Magento\CatalogGraphQl\Model\Resolver\Product\ProductCustomAttributes;
@@ -19,7 +19,7 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
  * attribute documents of the codes the product has a value for: the visible,
  * non-static ones, by attribute id as core's attribute list comes back, a
  * select or multiselect as its selected options in option order, each with
- * its document swatch under the prefiller key.
+ * its document swatch under OptionSwatch::KEY.
  */
 class CustomAttributesFromDocument
 {
@@ -103,14 +103,14 @@ class CustomAttributesFromDocument
                         ? ($attribute['frontendInput'] === 'select' ? [''] : [])
                         : explode(',', $values[$code]);
                     $item['selected_options'] = in_array('', $selected, true)
-                        ? [['value' => '', 'label' => ' ', PrefillerInterface::KEY => ['swatch' => null]]]
+                        ? [['value' => '', 'label' => ' ', OptionSwatch::KEY => null]]
                         : [];
                     foreach ((array)($attribute['options'] ?? []) as $option) {
                         if (in_array((string)$option['id'], $selected, true)) {
                             $item['selected_options'][] = [
                                 'value' => (string)$option['id'],
                                 'label' => $option['label'],
-                                PrefillerInterface::KEY => ['swatch' => $option['swatch'] ?? null],
+                                OptionSwatch::KEY => $option['swatch'] ?? null,
                             ];
                         }
                     }

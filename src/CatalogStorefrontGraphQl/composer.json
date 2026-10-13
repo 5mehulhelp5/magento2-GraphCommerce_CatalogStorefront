@@ -19,7 +19,8 @@
         "magento/module-jwt-user-token": "*",
         "magento/module-store": "*",
         "graphcommerce/module-catalog-storefront": "self.version",
-        "graphcommerce/module-catalog-storefront-graph-ql-api": "self.version"
+        "graphcommerce/module-catalog-storefront-graph-ql-api": "self.version",
+        "graphcommerce/module-graph-ql-catalog": "*"
     },
     "autoload": {
         "files": [

@@ -25,7 +25,8 @@
         "magento/module-scopes-data-exporter": "*",
         "magento/module-advanced-search": "*",
         "magento/module-open-search": "*",
-        "opensearch-project/opensearch-php": "*"
+        "opensearch-project/opensearch-php": "*",
+        "graphcommerce/magento-graphql-catalog": "*"
     },
     "replace": {
         "graphcommerce/module-catalog-storefront-api": "self.version",
@@ -74,7 +75,7 @@
         "magento/module-quote-graph-ql": "GraphCommerce_CatalogStorefrontQuoteGraphQl serves the display fields of a cart item product",
         "magento/module-wishlist-graph-ql": "GraphCommerce_CatalogStorefrontWishlistGraphQl serves a wish list item product",
         "magento/module-sales-graph-ql": "GraphCommerce_CatalogStorefrontSalesGraphQl serves an order item product",
-        "magento/module-swatches-graph-ql": "GraphCommerce_CatalogStorefrontSwatchesGraphQl serves the swatch of an aggregation option and an attribute option",
+        "magento/module-swatches-graph-ql": "GraphCommerce_CatalogStorefrontSwatchesGraphQl serves the swatches of GraphCommerce_GraphQlCatalogSwatches from documents",
         "magento/module-downloadable-graph-ql": "GraphCommerce_CatalogStorefrontDownloadable serves downloadable links and samples",
         "smile/elasticsuite": "GraphCommerce_CatalogStorefrontElasticsuite points the document store at the cluster ElasticSuite is configured with",
         "mage-os/module-profiler": "GraphCommerce_CatalogStorefrontProfiler times the document store client in a trace"

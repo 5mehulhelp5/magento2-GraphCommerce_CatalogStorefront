@@ -10,8 +10,8 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
 use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\AttributeMetadata;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\Read\FacetDocuments;
-use GraphCommerce\CatalogStorefrontGraphQl\Model\Resolver\AttributeValueMetadata;
-use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeValueMetadataFromDocuments;
+use GraphCommerce\GraphQlCatalog\Model\Resolver\Attribute;
+use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeFromDocuments;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\EnumLookup;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
@@ -21,7 +21,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class AttributeValueMetadataFromDocumentsTest extends TestCase
+class AttributeFromDocumentsTest extends TestCase
 {
     private const SHAPE = [
         'attributeCode' => 'shape', 'attributeId' => 140, 'label' => 'Shape', 'frontendInput' => 'select', 'isVisible' => true,
@@ -46,7 +46,7 @@ class AttributeValueMetadataFromDocumentsTest extends TestCase
         $facets->method('attributes')->willReturn($primed);
         $enums = $this->createStub(EnumLookup::class);
         $enums->method('getEnumValueFromField')->willReturnCallback(static fn(string $enum, string $input) => strtoupper($input));
-        $plugin = new AttributeValueMetadataFromDocuments(
+        $plugin = new AttributeFromDocuments(
             $attributeDocuments,
             $facets,
             new AttributeMetadata($enums),
@@ -55,7 +55,7 @@ class AttributeValueMetadataFromDocumentsTest extends TestCase
         );
 
         return $plugin->aroundResolve(
-            $this->createStub(AttributeValueMetadata::class),
+            $this->createStub(Attribute::class),
             static fn() => 'core',
             $this->createStub(Field::class),
             $context,

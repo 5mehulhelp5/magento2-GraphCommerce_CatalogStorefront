@@ -11,7 +11,7 @@ use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
 use Psr\Log\LoggerInterface;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\AttributeMetadata;
 use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributesListFromDocuments;
-use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
+use GraphCommerce\GraphQlCatalog\Model\OptionSwatch;
 use Magento\EavGraphQl\Model\Resolver\AttributesList;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\EnumLookup;
@@ -99,8 +99,8 @@ class AttributesListFromDocumentsTest extends TestCase
         self::assertSame(3, $color['sort_order']);
         self::assertSame('SELECT', $color['frontend_input']);
         self::assertSame([
-            ['label' => 'Red', 'value' => '5', 'is_default' => true, PrefillerInterface::KEY => ['swatch' => ['type' => 1, 'value' => '#ff0000']]],
-            ['label' => 'Blue', 'value' => '6', 'is_default' => false, PrefillerInterface::KEY => ['swatch' => null]],
+            ['label' => 'Red', 'value' => '5', 'is_default' => true, OptionSwatch::KEY => ['type' => 1, 'value' => '#ff0000']],
+            ['label' => 'Blue', 'value' => '6', 'is_default' => false, OptionSwatch::KEY => null],
         ], $color['options']);
         self::assertTrue($color['is_filterable']);
         self::assertTrue($color['is_searchable']);

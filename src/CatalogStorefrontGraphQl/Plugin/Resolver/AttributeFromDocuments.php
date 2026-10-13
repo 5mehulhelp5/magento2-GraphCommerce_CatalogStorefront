@@ -6,9 +6,9 @@ namespace GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver;
 use GraphCommerce\CatalogStorefront\Model\Mode;
 use GraphCommerce\CatalogStorefront\Model\Read\AttributeDocuments;
 use GraphCommerce\CatalogStorefront\Model\Strict;
+use GraphCommerce\GraphQlCatalog\Model\Resolver\Attribute;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\AttributeMetadata;
 use GraphCommerce\CatalogStorefrontGraphQl\Model\Read\FacetDocuments;
-use GraphCommerce\CatalogStorefrontGraphQl\Model\Resolver\AttributeValueMetadata;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
@@ -19,7 +19,7 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
  * documents the custom attributes of the page fetched. Core serves other entity types. An
  * aggregation without an attribute document is a category aggregation and answers null.
  */
-class AttributeValueMetadataFromDocuments
+class AttributeFromDocuments
 {
     public function __construct(
         private readonly AttributeDocuments $attributeDocuments,
@@ -31,7 +31,7 @@ class AttributeValueMetadataFromDocuments
     }
 
     public function aroundResolve(
-        AttributeValueMetadata $subject,
+        Attribute $subject,
         \Closure $proceed,
         Field $field,
         $context,

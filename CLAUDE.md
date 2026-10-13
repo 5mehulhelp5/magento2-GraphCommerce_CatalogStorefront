@@ -108,13 +108,14 @@ passes.
   unfiltered listing over 300 000 products against 0.2 s as one query; off
   (0), the engine's own limit of 10 000 stands.
 - `CatalogStorefrontGraphQl`: `DocumentHydration`
-  with the prefiller list, the two fields of `etc/schema.graphqls` (the only schema the
-  package adds besides the swatch module's): `custom_attributeV2(attribute_code)`, the entry
-  of the unfiltered `custom_attributesV2` list, and the `attribute` of an attribute value
-  and of an aggregation (`Model/Resolver/AttributeValueMetadata` on core's attribute data
-  providers, `Plugin/Resolver/AttributeValueMetadataFromDocuments` from the attribute
-  document through `Model/AttributeMetadata`, which `attributesList` shares; an aggregation
-  reads the primed facet documents, a category aggregation answers null), `Model/Query/PageSizeLimit` (a page over 2 000
+  with the prefiller list, the document path of the fields the required package
+  `graphcommerce/magento-graphql-catalog` (GraphCommerce_GraphQlCatalog and
+  GraphCommerce_GraphQlCatalogSwatches) defines, which is the only schema the read model
+  adds: `custom_attributeV2` through the `custom_attributesV2` plugin, and the `attribute`
+  of an attribute value and of an aggregation (`Plugin/Resolver/AttributeFromDocuments` on
+  its resolver, from the attribute document through `Model/AttributeMetadata`, which
+  `attributesList` shares; an aggregation reads the primed facet documents, a category
+  aggregation answers null), `Model/Query/PageSizeLimit` (a page over 2 000
   items is refused on both paths, in the argument validator every resolver
   passes: a full document decodes to about 65 KB, 10 000 of them hold 650 MB,
   and core's own GraphQL page size limit is not wired in Mage-OS; a source
@@ -146,12 +147,11 @@ passes.
 - `CatalogStorefrontSwatches` / `...SwatchesGraphQl`: the swatch of every option of a
   swatch attribute on the attribute documents (`Plugin/DataExporter/AttributeOptionSwatches`,
   picked per store view as core's swatch helper picks it; an image swatch keeps its file) /
-  the `swatch` field on `AggregationOptionInterface`, `CustomAttributeOptionInterface` and
-  `AttributeSelectedOptionInterface`. `Model/Resolver/SwatchData` reads the swatch an option
-  carries under the prefiller key and builds the thumbnail URL of a document image swatch;
-  the document path puts the document swatch there (the GraphQl module's option builders,
-  `Plugin/Layer/AggregationSwatches` from the primed facet documents), the core path core's
-  swatch helper (`Plugin/Output/*`, the same layer plugin).
+  the document path of the `swatch` fields of GraphCommerce_GraphQlCatalogSwatches: the
+  GraphQl module's option builders put the document swatch under `OptionSwatch::KEY`, and
+  `Plugin/Layer/AggregationSwatchesFromDocuments` (sort order 10) puts it on the aggregation
+  options from the primed facet documents before the core plugin (20), which keeps an option
+  that carries the key.
 - `CatalogStorefrontQuoteGraphQl`: `Plugin/Resolver/CartItemProductsFromDocuments`
   on the two cart items resolvers: the document and the prefilled fields land
   on the product model the quote loaded, so the row prices and the quantity

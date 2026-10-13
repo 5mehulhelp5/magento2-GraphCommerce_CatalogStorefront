@@ -5,8 +5,8 @@ are. The catalog reads come from one document per product and store view in Open
 the catalog GraphQL queries, and, per store view, the rendered category, search and
 product pages of a Luma or Hyvä theme. A field the documents do not carry is answered by
 the core resolver of that field, so the storefront code stays the same. The GraphQL schema
-gets only the fields under [Fields the package adds](#fields-the-package-adds), which both
-paths answer.
+gets only the fields of the required GraphQL Catalog package
+([Fields the package adds](#fields-the-package-adds)), which both paths answer.
 
 [`magento/commerce-data-export`](https://github.com/magento/commerce-data-export) is
 Adobe's exporter: it turns the catalog into feed rows for Adobe's SaaS services, as
@@ -21,7 +21,9 @@ documents use that same connection through core's OpenSearch client.
 `magento/commerce-data-export` 103.4 or later comes from repo.magento.com, or from the
 Mage-OS fork [mage-os/mageos-commerce-data-export](https://github.com/mage-os/mageos-commerce-data-export),
 which an install without Adobe keys adds as composer `path` repositories, as
-[.github/workflows/ci.yml](.github/workflows/ci.yml) does.
+[.github/workflows/ci.yml](.github/workflows/ci.yml) does. The package requires
+[`graphcommerce/magento-graphql-catalog`](https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog);
+a project that installs from git adds that repository next to this one.
 
 1. Install the package and compile. Composer autoload registers every module, and
    `setup:upgrade` enables them.
@@ -241,19 +243,16 @@ runs core alone.
 
 ## Fields the package adds
 
-Each field has a core path resolver, so `X-Catalog-Storefront: core` answers it too and the
-parity gate compares both paths (`dev/parity/queries/34-*` and `35-*`).
+The package requires [GraphCommerce GraphQL Catalog](https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog)
+(`graphcommerce/magento-graphql-catalog`), which defines these fields and answers them from
+core. The read model serves them from documents; `X-Catalog-Storefront: core` gets core's
+answer, and the parity gate compares both paths (`dev/parity/queries/34-*` and `35-*`).
 
-| Field | Module | Answers |
+| Field | Defined by | Served from documents by |
 | --- | --- | --- |
-| `ProductInterface.custom_attributeV2(attribute_code)` | `...GraphQl` | The entry of `custom_attributesV2` with that code, or null |
-| `AttributeValueInterface.attribute`, `Aggregation.attribute` | `...GraphQl` | The attribute metadata, as `customAttributeMetadataV2` returns it; null for a category aggregation |
-| `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `...SwatchesGraphQl` | The `SwatchDataInterface` of an option of a swatch attribute, or null |
-
-The fields have the names and arguments of GraphCommerce's mesh extension
-(`packages/magento-graphql/schema`), so a storefront drops its mesh resolvers and their
-`customAttributeMetadataV2` call per attribute. `Aggregation.attribute` gives a filter its
-`frontend_input` and swatch type, where a storefront otherwise asks `attributesList`.
+| `ProductInterface.custom_attributeV2(attribute_code)` | `GraphQlCatalog` | `...GraphQl` (the `custom_attributesV2` plugin) |
+| `AttributeValueInterface.attribute`, `Aggregation.attribute` | `GraphQlCatalog` | `...GraphQl` |
+| `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `GraphQlCatalogSwatches` | `...Swatches` / `...SwatchesGraphQl` |
 
 ## Reference
 
@@ -505,7 +504,7 @@ the base module and the GraphQl module.
 | [`...GroupedProduct`](src/CatalogStorefrontGroupedProduct) / [`...GraphQl`](src/CatalogStorefrontGroupedProductGraphQl) / [`...Frontend`](src/CatalogStorefrontGroupedProductFrontend) | Grouped range / grouped items / rendered children and quantity validation |
 | [`...Downloadable`](src/CatalogStorefrontDownloadable) / [`...GraphQl`](src/CatalogStorefrontDownloadableGraphQl) | The downloadable range / links and samples |
 | [`...Review`](src/CatalogStorefrontReview) / [`...GraphQl`](src/CatalogStorefrontReviewGraphQl) / [`...Frontend`](src/CatalogStorefrontReviewFrontend) | Review and rating feeds / rating summary, breakdown and reviews / the rating collection of the rendered review form |
-| [`...Swatches`](src/CatalogStorefrontSwatches) / [`...GraphQl`](src/CatalogStorefrontSwatchesGraphQl) | The swatch of every option on the attribute documents / the `swatch` fields |
+| [`...Swatches`](src/CatalogStorefrontSwatches) / [`...GraphQl`](src/CatalogStorefrontSwatchesGraphQl) | The swatch of every option on the attribute documents / the `swatch` fields of GraphQL Catalog from them |
 | [`...QuoteGraphQl`](src/CatalogStorefrontQuoteGraphQl) | The display fields of a cart item's product |
 | [`...WishlistGraphQl`](src/CatalogStorefrontWishlistGraphQl) | Wish list item products, one document request per list |
 | [`...SalesGraphQl`](src/CatalogStorefrontSalesGraphQl) | Order item products, one document request per order |

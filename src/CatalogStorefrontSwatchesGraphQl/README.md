@@ -1,16 +1,12 @@
 # GraphCommerce_CatalogStorefrontSwatchesGraphQl
 
-The `swatch` field (`SwatchDataInterface`, as `ConfigurableProductOptionValue.swatch`) on
-`AggregationOptionInterface`, `CustomAttributeOptionInterface` and
-`AttributeSelectedOptionInterface`. It depends on Magento_SwatchesGraphQl.
+Serves the `swatch` fields of GraphCommerce_GraphQlCatalogSwatches
+([GraphCommerce GraphQL Catalog](https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog))
+from the attribute documents (GraphCommerce_CatalogStorefrontSwatches).
 
-- [`Model/Resolver/SwatchData`](Model/Resolver/SwatchData.php) answers the swatch an option
-  carries under the prefiller key, and builds the thumbnail URL of a document image swatch.
-- The document path takes the swatch from the attribute documents
-  (GraphCommerce_CatalogStorefrontSwatches): `CatalogStorefrontGraphQl` puts it on the options
-  it builds, [`Plugin/Layer/AggregationSwatches`](Plugin/Layer/AggregationSwatches.php) on the
-  aggregation options from the documents the facet read primed.
-- The core path takes it from core's swatch helper
-  ([`Model/Swatches`](Model/Swatches.php)): `Plugin/Output/*` on core's attribute metadata and
-  attribute value providers, `AggregationSwatches` on the aggregation options. Only the options
-  of a swatch attribute carry one.
+- `CatalogStorefrontGraphQl` puts the document swatch on the attribute and selected options it
+  builds, under `OptionSwatch::KEY`.
+- [`Plugin/Layer/AggregationSwatchesFromDocuments`](Plugin/Layer/AggregationSwatchesFromDocuments.php)
+  puts it on the aggregation options, from the attribute documents the facet read primed. Its sort
+  order (10) runs it before the core plugin of GraphQlCatalogSwatches (20), which keeps the options
+  that carry the key, so the document path reads no swatch table.
