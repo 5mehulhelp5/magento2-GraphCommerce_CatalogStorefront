@@ -8,6 +8,7 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
 use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributeValueTypeFromDocument;
 use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\CustomAttributesFromDocument;
 use GraphCommerce\CatalogStorefrontGraphQlApi\Read\HydrationInterface;
+use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
 use Magento\Catalog\Model\FilterProductCustomAttribute;
 use Magento\Catalog\Model\Product;
 use Magento\CatalogGraphQl\Model\Resolver\Product\ProductCustomAttributes;
@@ -26,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 class CustomAttributesFromDocumentTest extends TestCase
 {
     private const ATTRIBUTES = [
-        'color' => ['attributeId' => 93, 'isVisible' => true, 'frontendInput' => 'select', 'options' => [['id' => '5', 'label' => 'Red']]],
+        'color' => ['attributeId' => 93, 'isVisible' => true, 'frontendInput' => 'select', 'options' => [['id' => '5', 'label' => 'Red', 'swatch' => ['type' => 1, 'value' => '#ff0000']]]],
         'tags' => ['attributeId' => 94, 'isVisible' => true, 'frontendInput' => 'multiselect', 'options' => [['id' => '8', 'label' => 'Sale']]],
         'note' => ['attributeId' => 95, 'isVisible' => true, 'frontendInput' => 'text'],
     ];
@@ -70,7 +71,7 @@ class CustomAttributesFromDocumentTest extends TestCase
     {
         $items = $this->items(['color' => null, 'tags' => null]);
 
-        self::assertSame([['value' => '', 'label' => ' ']], $items['color']['selected_options']);
+        self::assertSame([['value' => '', 'label' => ' ', PrefillerInterface::KEY => ['swatch' => null]]], $items['color']['selected_options']);
         self::assertSame([], $items['tags']['selected_options']);
     }
 
@@ -78,16 +79,16 @@ class CustomAttributesFromDocumentTest extends TestCase
     {
         $items = $this->items(['color' => '', 'tags' => '']);
 
-        self::assertSame([['value' => '', 'label' => ' ']], $items['color']['selected_options']);
-        self::assertSame([['value' => '', 'label' => ' ']], $items['tags']['selected_options']);
+        self::assertSame([['value' => '', 'label' => ' ', PrefillerInterface::KEY => ['swatch' => null]]], $items['color']['selected_options']);
+        self::assertSame([['value' => '', 'label' => ' ', PrefillerInterface::KEY => ['swatch' => null]]], $items['tags']['selected_options']);
     }
 
     public function testAValueSelectsItsOptions(): void
     {
         $items = $this->items(['color' => '5', 'tags' => '8,9']);
 
-        self::assertSame([['value' => '5', 'label' => 'Red']], $items['color']['selected_options']);
-        self::assertSame([['value' => '8', 'label' => 'Sale']], $items['tags']['selected_options']);
+        self::assertSame([['value' => '5', 'label' => 'Red', PrefillerInterface::KEY => ['swatch' => ['type' => 1, 'value' => '#ff0000']]]], $items['color']['selected_options']);
+        self::assertSame([['value' => '8', 'label' => 'Sale', PrefillerInterface::KEY => ['swatch' => null]]], $items['tags']['selected_options']);
         self::assertSame('AttributeSelectedOptions', $items['tags'][AttributeValueTypeFromDocument::KEY]);
     }
 

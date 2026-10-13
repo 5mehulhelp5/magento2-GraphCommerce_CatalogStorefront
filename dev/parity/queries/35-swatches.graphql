@@ -1,0 +1,61 @@
+fragment Swatch on SwatchDataInterface {
+  __typename
+  value
+  ... on ImageSwatchData {
+    thumbnail
+  }
+}
+
+{
+  products(filter: { sku: { in: [{{skus:any:swatch:6}}] } }) {
+    aggregations {
+      attribute_code
+      options {
+        value
+        label
+        count
+        swatch {
+          ...Swatch
+        }
+      }
+    }
+    items {
+      sku
+      custom_attributesV2 {
+        items {
+          code
+          ... on AttributeSelectedOptions {
+            selected_options {
+              value
+              label
+              swatch {
+                ...Swatch
+              }
+            }
+          }
+          attribute {
+            code
+            options {
+              value
+              swatch {
+                ...Swatch
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  attributesList(entityType: CATALOG_PRODUCT, filters: { is_filterable: true }) {
+    items {
+      code
+      options {
+        value
+        label
+        swatch {
+          ...Swatch
+        }
+      }
+    }
+  }
+}

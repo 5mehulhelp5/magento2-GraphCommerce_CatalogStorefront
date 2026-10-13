@@ -1,0 +1,7 @@
+interface ProductInterface {
+    custom_attributeV2(attribute_code: String! @doc(description: "The attribute code.")): AttributeValueInterface @doc(description: "The value of one custom attribute, as custom_attributesV2 lists it, or null.") @resolver(class: "GraphCommerce\\CatalogStorefrontGraphQl\\Model\\Resolver\\ProductCustomAttribute")
+}
+
+interface AttributeValueInterface {
+    attribute: CustomAttributeMetadataInterface @doc(description: "The metadata of the attribute, as customAttributeMetadataV2 returns it.") @resolver(class: "GraphCommerce\\CatalogStorefrontGraphQl\\Model\\Resolver\\AttributeValueMetadata")
+}

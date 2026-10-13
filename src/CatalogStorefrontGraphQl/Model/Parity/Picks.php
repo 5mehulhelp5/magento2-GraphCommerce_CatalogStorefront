@@ -18,8 +18,9 @@ use Magento\Store\Model\StoreManagerInterface;
  * of the installation. A kind is a product type (`simple`, `configurable`,
  * `bundle`, `grouped`, `downloadable`, `virtual` or `any`), followed by a
  * trait: `special-price`, `tier-price`, `reviewed`, `links`, `fixed` (a
- * bundle with a fixed price), `fpt` (a fixed product tax) or `child` (a
- * simple product under a configurable one). Only enabled products on the
+ * bundle with a fixed price), `fpt` (a fixed product tax), `child` (a
+ * simple product under a configurable one) or `swatch` (a value that is a
+ * swatch option). Only enabled products on the
  * default website count, with the core stock visibility filter. The trait
  * `child` includes hidden products. Products use ascending entity id.
  * A category kind names the products it holds: the active
@@ -169,6 +170,11 @@ class Picks
             'fixed' => $this->joinAttribute($select, 'e', Product::ENTITY, 'price_type', 'price_type', 'price_type.value = 1', 'catalog_product_entity_int'),
             'fpt' => $select->where($exists('weee_tax', 'entity_id')),
             'child' => $select->where($exists('catalog_product_super_link', 'product_id')),
+            'swatch' => $select->where(sprintf(
+                'EXISTS (SELECT 1 FROM %s t JOIN %s s ON s.option_id = t.value WHERE t.entity_id = e.entity_id)',
+                $this->resource->getTableName('catalog_product_entity_int'),
+                $this->resource->getTableName('eav_attribute_option_swatch')
+            )),
             default => throw new \InvalidArgumentException(sprintf('Unknown product trait "%s"', $trait)),
         };
     }

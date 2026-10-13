@@ -196,6 +196,8 @@ jobs:
           php ${{ github.workspace }}/dev/parity/fixtures/fixed-product-tax.php
           # A manual price step on the category of the aggregations query, read with manual price navigation.
           php ${{ github.workspace }}/dev/parity/fixtures/category-price-step.php
+          # Two swatch attributes (colours, an image, a text with a store view label) on 24 products, read by the swatch query.
+          php ${{ github.workspace }}/dev/parity/fixtures/swatch-attributes.php
           # A wish list and one placed order, the subjects of the wish list and order queries.
           php ${{ github.workspace }}/dev/parity/fixtures/customer-wishlist.php customer@example.com
           php ${{ github.workspace }}/dev/parity/fixtures/customer-order.php customer@example.com

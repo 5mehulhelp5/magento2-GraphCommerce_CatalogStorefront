@@ -5,6 +5,7 @@ namespace GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver;
 
 use GraphCommerce\CatalogStorefront\Model\Read\AttributeDocuments;
 use GraphCommerce\CatalogStorefrontGraphQlApi\Read\HydrationInterface;
+use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Model\FilterProductCustomAttribute;
 use Magento\CatalogGraphQl\Model\Resolver\Product\ProductCustomAttributes;
@@ -17,7 +18,8 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
  * Serves custom_attributesV2 from the document's raw attribute values and the
  * attribute documents of the codes the product has a value for: the visible,
  * non-static ones, by attribute id as core's attribute list comes back, a
- * select or multiselect as its selected options in option order.
+ * select or multiselect as its selected options in option order, each with
+ * its document swatch under the prefiller key.
  */
 class CustomAttributesFromDocument
 {
@@ -100,10 +102,16 @@ class CustomAttributesFromDocument
                     $selected = $values[$code] === null
                         ? ($attribute['frontendInput'] === 'select' ? [''] : [])
                         : explode(',', $values[$code]);
-                    $item['selected_options'] = in_array('', $selected, true) ? [['value' => '', 'label' => ' ']] : [];
+                    $item['selected_options'] = in_array('', $selected, true)
+                        ? [['value' => '', 'label' => ' ', PrefillerInterface::KEY => ['swatch' => null]]]
+                        : [];
                     foreach ((array)($attribute['options'] ?? []) as $option) {
                         if (in_array((string)$option['id'], $selected, true)) {
-                            $item['selected_options'][] = ['value' => (string)$option['id'], 'label' => $option['label']];
+                            $item['selected_options'][] = [
+                                'value' => (string)$option['id'],
+                                'label' => $option['label'],
+                                PrefillerInterface::KEY => ['swatch' => $option['swatch'] ?? null],
+                            ];
                         }
                     }
                     $item[AttributeValueTypeFromDocument::KEY] = 'AttributeSelectedOptions';

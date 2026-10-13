@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="GraphCommerce\CatalogStorefront\Model\DataExporter\Provider\AttributeOptions">
+        <plugin name="graphcommerce_catalog_storefront_attribute_option_swatches" type="GraphCommerce\CatalogStorefrontSwatches\Plugin\DataExporter\AttributeOptionSwatches"/>
+    </type>
+</config>

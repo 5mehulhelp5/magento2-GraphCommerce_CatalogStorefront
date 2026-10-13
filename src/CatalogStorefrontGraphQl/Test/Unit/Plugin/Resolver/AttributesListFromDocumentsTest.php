@@ -9,7 +9,9 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
 use GraphCommerce\CatalogStorefront\Model\DocumentReadException;
 use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
 use Psr\Log\LoggerInterface;
+use GraphCommerce\CatalogStorefrontGraphQl\Model\AttributeMetadata;
 use GraphCommerce\CatalogStorefrontGraphQl\Plugin\Resolver\AttributesListFromDocuments;
+use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
 use Magento\EavGraphQl\Model\Resolver\AttributesList;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\EnumLookup;
@@ -27,7 +29,7 @@ class AttributesListFromDocumentsTest extends TestCase
             'backendType' => 'int', 'isVisible' => true, 'required' => false, 'unique' => false, 'defaultValue' => '5',
             'filterableMode' => 1, 'searchable' => true, 'visibleInListing' => true, 'visibleInSearch' => false,
             'applyTo' => 'simple,configurable', 'additionalData' => '{"swatch_input_type":"visual","update_product_preview_image":1}',
-            'options' => [['id' => '5', 'label' => 'Red'], ['id' => '6', 'label' => 'Blue'], ['id' => '', 'label' => ' ']],
+            'options' => [['id' => '5', 'label' => 'Red', 'swatch' => ['type' => 1, 'value' => '#ff0000']], ['id' => '6', 'label' => 'Blue'], ['id' => '', 'label' => ' ']],
         ],
         'size' => [
             'attributeCode' => 'size', 'attributeId' => 94, 'label' => 'Size', 'frontendInput' => 'select', 'backendType' => 'int',
@@ -66,7 +68,7 @@ class AttributesListFromDocumentsTest extends TestCase
         $enums = $this->createMock(EnumLookup::class);
         $enums->method('getEnumValueFromField')->willReturnCallback(static fn(string $enum, string $value) => strtoupper($value));
 
-        return new AttributesListFromDocuments($this->documents, $enums, $this->mode, $this->strict);
+        return new AttributesListFromDocuments($this->documents, new AttributeMetadata($enums), $this->mode, $this->strict);
     }
 
     private function resolve(AttributesListFromDocuments $plugin, array $args, callable $core): array
@@ -97,8 +99,8 @@ class AttributesListFromDocumentsTest extends TestCase
         self::assertSame(3, $color['sort_order']);
         self::assertSame('SELECT', $color['frontend_input']);
         self::assertSame([
-            ['label' => 'Red', 'value' => '5', 'is_default' => true],
-            ['label' => 'Blue', 'value' => '6', 'is_default' => false],
+            ['label' => 'Red', 'value' => '5', 'is_default' => true, PrefillerInterface::KEY => ['swatch' => ['type' => 1, 'value' => '#ff0000']]],
+            ['label' => 'Blue', 'value' => '6', 'is_default' => false, PrefillerInterface::KEY => ['swatch' => null]],
         ], $color['options']);
         self::assertTrue($color['is_filterable']);
         self::assertTrue($color['is_searchable']);
@@ -136,7 +138,7 @@ class AttributesListFromDocumentsTest extends TestCase
 
         $mode = $this->createMock(Mode::class);
         $mode->method('documents')->willReturn(false);
-        $plugin = new AttributesListFromDocuments($this->documents, $this->createMock(EnumLookup::class), $mode, $this->strict);
+        $plugin = new AttributesListFromDocuments($this->documents, new AttributeMetadata($this->createMock(EnumLookup::class)), $mode, $this->strict);
         self::assertSame(['core'], $this->resolve($plugin, ['entityType' => 'CATALOG_PRODUCT', 'filters' => []], $core)['items']);
     }
 
