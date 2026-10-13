@@ -5,6 +5,7 @@
             <module name="GraphCommerce_CatalogStorefrontConfigurableProduct"/>
             <module name="GraphCommerce_CatalogStorefrontGraphQl"/>
             <module name="GraphCommerce_CatalogStorefrontPriceGraphQl"/>
+            <module name="GraphCommerce_GraphQlCatalogConfigurableProduct"/>
             <module name="Magento_ConfigurableProductGraphQl"/>
             <module name="Magento_Swatches"/>
         </sequence>

@@ -1,0 +1,63 @@
+# configurable_product_options_selection(followFilters: true) selects the values the products
+# filter names, on one configurable product and on a listing filtered on that option.
+fragment Selection on ConfigurableProductOptionsSelection {
+  __typename
+  configurable_options {
+    attribute_code
+    uid
+    values {
+      uid
+      label
+      is_available
+    }
+  }
+  options_available_for_selection {
+    attribute_code
+    option_value_uids
+  }
+  # The label of a file two variants share follows the collection order on core.
+  media_gallery {
+    __typename
+    url
+    position
+    disabled
+  }
+  variant {
+    __typename
+    uid
+    sku
+    name
+  }
+}
+
+query {
+  one: products(filter: { url_key: { eq: "{{url_key:configurable}}" }, {{option_filter:configurable}} }) {
+    items {
+      __typename
+      uid
+      ... on ConfigurableProduct {
+        follow: configurable_product_options_selection(followFilters: true) {
+          ...Selection
+        }
+        explicit: configurable_product_options_selection(followFilters: true, configurableOptionValueUids: ["{{option_uid:configurable}}"]) {
+          ...Selection
+        }
+        none: configurable_product_options_selection {
+          ...Selection
+        }
+      }
+    }
+  }
+  listing: products(filter: { {{option_filter:configurable}} }, pageSize: 12, sort: { name: ASC }) {
+    items {
+      __typename
+      uid
+      sku
+      ... on ConfigurableProduct {
+        configurable_product_options_selection(followFilters: true) {
+          ...Selection
+        }
+      }
+    }
+  }
+}

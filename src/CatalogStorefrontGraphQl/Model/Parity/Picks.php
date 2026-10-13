@@ -78,19 +78,44 @@ class Picks
      */
     public function optionUid(string $kind): ?string
     {
+        $option = $this->superOption($kind, false);
+
+        return $option ? $this->uidEncoder->encode('configurable/' . $option['attribute_id'] . '/' . $option['value']) : null;
+    }
+
+    /**
+     * A products filter entry for the lowest option of the first filterable super
+     * attribute of the picked configurable product: `color: { eq: "50" }`.
+     */
+    public function optionFilter(string $kind): ?string
+    {
+        $option = $this->superOption($kind, true);
+
+        return $option ? sprintf('%s: { eq: "%d" }', $option['attribute_code'], $option['value']) : null;
+    }
+
+    /**
+     * @return array{attribute_id: int, attribute_code: string, value: int}|null the lowest option a
+     *   child carries of the first super attribute, filterable in the layered navigation when asked
+     */
+    private function superOption(string $kind, bool $filterable): ?array
+    {
         $connection = $this->connection();
         $productId = $this->one($this->products($kind === 'any' ? 'configurable' : $kind)->columns('e.entity_id')->limit(1));
         if ($productId === null) {
             return null;
         }
-        $attributeId = $connection->fetchOne(
-            $connection->select()
-                ->from($this->resource->getTableName('catalog_product_super_attribute'), 'attribute_id')
-                ->where('product_id = ?', (int)$productId)
-                ->order(['position ASC', 'product_super_attribute_id ASC'])
-                ->limit(1)
-        );
-        if ($attributeId === false) {
+        $select = $connection->select()
+            ->from(['s' => $this->resource->getTableName('catalog_product_super_attribute')], 'attribute_id')
+            ->join(['a' => $this->resource->getTableName('eav_attribute')], 'a.attribute_id = s.attribute_id', 'attribute_code')
+            ->where('s.product_id = ?', (int)$productId)
+            ->order(['s.position ASC', 's.product_super_attribute_id ASC'])
+            ->limit(1);
+        if ($filterable) {
+            $select->join(['c' => $this->resource->getTableName('catalog_eav_attribute')], 'c.attribute_id = s.attribute_id AND c.is_filterable > 0', []);
+        }
+        $attribute = $connection->fetchRow($select);
+        if (!$attribute) {
             return null;
         }
         $option = $connection->fetchOne(
@@ -98,10 +123,10 @@ class Picks
                 ->from(['l' => $this->resource->getTableName('catalog_product_super_link')], [])
                 ->join(['v' => $this->resource->getTableName('catalog_product_entity_int')], 'v.entity_id = l.product_id AND v.store_id = 0', ['value' => 'MIN(v.value)'])
                 ->where('l.parent_id = ?', (int)$productId)
-                ->where('v.attribute_id = ?', (int)$attributeId)
+                ->where('v.attribute_id = ?', (int)$attribute['attribute_id'])
         );
 
-        return $option ? $this->uidEncoder->encode('configurable/' . (int)$attributeId . '/' . (int)$option) : null;
+        return $option ? ['attribute_id' => (int)$attribute['attribute_id'], 'attribute_code' => (string)$attribute['attribute_code'], 'value' => (int)$option] : null;
     }
 
     /**

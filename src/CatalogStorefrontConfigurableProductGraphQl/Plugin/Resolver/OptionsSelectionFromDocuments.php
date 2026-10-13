@@ -6,6 +6,7 @@ namespace GraphCommerce\CatalogStorefrontConfigurableProductGraphQl\Plugin\Resol
 use GraphCommerce\CatalogStorefrontConfigurableProductGraphQl\Model\Read\ConfigurableOptions;
 use GraphCommerce\CatalogStorefrontGraphQlApi\Read\HydrationInterface;
 use GraphCommerce\CatalogStorefrontGraphQlApi\Read\PrefillerInterface;
+use GraphCommerce\GraphQlCatalog\Model\ActiveFilters;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\ConfigurableProductGraphQl\Model\Options\SelectionUidFormatter;
 use Magento\ConfigurableProductGraphQl\Model\Resolver\OptionsSelectionMetadata;
@@ -23,7 +24,8 @@ use GraphCommerce\CatalogStorefront\Model\Strict;
  * availability of every value, the values still selectable per attribute,
  * the variant when the selection leaves one, whether or not every option is
  * selected, and the media gallery entries of the variants that match, as core
- * assembles them.
+ * assembles them. With followFilters the filter of the products query selects
+ * under the given uids, over the same variants.
  */
 class OptionsSelectionFromDocuments
 {
@@ -33,6 +35,7 @@ class OptionsSelectionFromDocuments
         private readonly Uid $uidEncoder,
         private readonly Strict $strict,
         private readonly ConfigurableOptions $configurableOptions,
+        private readonly ActiveFilters $activeFilters,
     ) {
     }
 
@@ -77,6 +80,9 @@ class OptionsSelectionFromDocuments
                     }
                     $index[$variantId][(int)$option['attribute_id']] = $attributeValue;
                 }
+            }
+            if (!empty($args['followFilters'])) {
+                $selected += $this->activeFilters->selection($info, array_column($options, 'attribute_id', 'attribute_code'), $index);
             }
             foreach ($selected as $attributeId => $valueIndex) {
                 if (!isset($byValue[$attributeId][$valueIndex])) {
