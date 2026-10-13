@@ -1,0 +1,76 @@
+fragment Metadata on CustomAttributeMetadataInterface {
+  code
+  label
+  entity_type
+  frontend_input
+  frontend_class
+  is_required
+  default_value
+  is_unique
+  options {
+    label
+    value
+    is_default
+  }
+  ... on CatalogAttributeMetadata {
+    apply_to
+    is_comparable
+    is_filterable
+    is_filterable_in_search
+    is_searchable
+    is_used_for_price_rules
+    is_visible_on_front
+    used_in_product_listing
+    swatch_input_type
+  }
+}
+
+fragment Value on AttributeValueInterface {
+  code
+  ... on AttributeValue {
+    value
+  }
+  ... on AttributeSelectedOptions {
+    selected_options {
+      label
+      value
+    }
+  }
+  attribute {
+    ...Metadata
+  }
+}
+
+{
+  products(filter: { category_id: { eq: "{{category_id:any}}" } }, pageSize: 50) {
+    items {
+      sku
+      name: custom_attributeV2(attribute_code: "name") {
+        ...Value
+      }
+      description: custom_attributeV2(attribute_code: "description") {
+        ...Value
+      }
+      status: custom_attributeV2(attribute_code: "status") {
+        ...Value
+      }
+      visibility: custom_attributeV2(attribute_code: "visibility") {
+        ...Value
+      }
+      tax_class: custom_attributeV2(attribute_code: "tax_class_id") {
+        ...Value
+      }
+      color: custom_attributeV2(attribute_code: "color") {
+        ...Value
+      }
+      missing: custom_attributeV2(attribute_code: "gc_no_such_attribute") {
+        ...Value
+      }
+      custom_attributesV2(filters: { is_comparable: true }) {
+        items {
+          ...Value
+        }
+      }
+    }
+  }
+}

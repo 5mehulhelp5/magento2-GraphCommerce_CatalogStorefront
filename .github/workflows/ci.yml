@@ -52,6 +52,8 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/mage-os/mageos-commerce-data-export.git ${{ github.workspace }}/_cde
           composer config repositories.cde path '${{ github.workspace }}/_cde/*'
+          git clone --depth 1 https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog.git ${{ github.workspace }}/_graphql_catalog
+          composer config repositories.graphql-catalog path '${{ github.workspace }}/_graphql_catalog'
           composer config repositories.package path '${{ github.workspace }}'
           composer config minimum-stability dev
           composer config prefer-stable true
@@ -114,6 +116,8 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/mage-os/mageos-commerce-data-export.git ${{ github.workspace }}/_cde
           composer config repositories.cde path '${{ github.workspace }}/_cde/*'
+          git clone --depth 1 https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog.git ${{ github.workspace }}/_graphql_catalog
+          composer config repositories.graphql-catalog path '${{ github.workspace }}/_graphql_catalog'
           composer config repositories.package path '${{ github.workspace }}'
           # FastBoot serves the scopes, the customer groups and the tax rates from node-local
           # entries, as a production shop runs them, so the statement gate sees catalog reads only.
@@ -196,6 +200,8 @@ jobs:
           php ${{ github.workspace }}/dev/parity/fixtures/fixed-product-tax.php
           # A manual price step on the category of the aggregations query, read with manual price navigation.
           php ${{ github.workspace }}/dev/parity/fixtures/category-price-step.php
+          # Two swatch attributes (colours, an image, a text with a store view label) on 24 products, read by the swatch query.
+          php ${{ github.workspace }}/dev/parity/fixtures/swatch-attributes.php
           # A wish list and one placed order, the subjects of the wish list and order queries.
           php ${{ github.workspace }}/dev/parity/fixtures/customer-wishlist.php customer@example.com
           php ${{ github.workspace }}/dev/parity/fixtures/customer-order.php customer@example.com

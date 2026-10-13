@@ -108,7 +108,14 @@ passes.
   unfiltered listing over 300 000 products against 0.2 s as one query; off
   (0), the engine's own limit of 10 000 stands.
 - `CatalogStorefrontGraphQl`: `DocumentHydration`
-  with the prefiller list, `Model/Query/PageSizeLimit` (a page over 2 000
+  with the prefiller list, the document path of the fields the required package
+  `graphcommerce/magento-graphql-catalog` (GraphCommerce_GraphQlCatalog and
+  GraphCommerce_GraphQlCatalogSwatches) defines, which is the only schema the read model
+  adds: `custom_attributeV2` through the `custom_attributesV2` plugin, and the `attribute`
+  of an attribute value and of an aggregation (`Plugin/Resolver/AttributeFromDocuments` on
+  its resolver, from the attribute document through `Model/AttributeMetadata`, which
+  `attributesList` shares; an aggregation reads the primed facet documents, a category
+  aggregation answers null), `Model/Query/PageSizeLimit` (a page over 2 000
   items is refused on both paths, in the argument validator every resolver
   passes: a full document decodes to about 65 KB, 10 000 of them hold 650 MB,
   and core's own GraphQL page size limit is not wired in Mage-OS; a source
@@ -137,6 +144,14 @@ passes.
   check from the token where core loads the customer to prove the id. A
   signed-in catalog request reads the revoked table, the address join and
   the rates of the product tax classes, nothing else about the customer.
+- `CatalogStorefrontSwatches` / `...SwatchesGraphQl`: the swatch of every option of a
+  swatch attribute on the attribute documents (`Plugin/DataExporter/AttributeOptionSwatches`,
+  picked per store view as core's swatch helper picks it; an image swatch keeps its file) /
+  the document path of the `swatch` fields of GraphCommerce_GraphQlCatalogSwatches: the
+  GraphQl module's option builders put the document swatch under `OptionSwatch::KEY`, and
+  `Plugin/Layer/AggregationSwatchesFromDocuments` (sort order 10) puts it on the aggregation
+  options from the primed facet documents before the core plugin (20), which keeps an option
+  that carries the key.
 - `CatalogStorefrontQuoteGraphQl`: `Plugin/Resolver/CartItemProductsFromDocuments`
   on the two cart items resolvers: the document and the prefilled fields land
   on the product model the quote loaded, so the row prices and the quantity
@@ -671,6 +686,11 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   stock query (`18-*.graphql`) needs `24-WG01` at quantity 1 (source item and
   legacy stock item, then reindex `inventory`, `cataloginventory_stock` and
   the stock feed), so only_x_left_in_stock has a number to compare.
+  The swatch query (`35-*.graphql`) needs a swatch attribute value on a product: the demo
+  catalog's `color` and `size` have them; `php dev/parity/fixtures/swatch-attributes.php`
+  adds two (a visual one with an image swatch, a text one with a store view label) on 24
+  products, then reindex the product attributes feed, the products feed and the search
+  index for those products.
 - A mapping added under `EntityMappings` reaches an index only through
   `setup:di:compile` (the generated metadata holds the arguments, in developer
   mode too) and then `catalog-storefront:rebuild <entity>`; a rebuild before the

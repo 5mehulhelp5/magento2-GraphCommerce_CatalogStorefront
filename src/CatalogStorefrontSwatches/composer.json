@@ -1,0 +1,21 @@
+{
+    "name": "graphcommerce/module-catalog-storefront-swatches",
+    "description": "The swatch of every option of a swatch attribute on the attribute documents of the catalog read model",
+    "type": "magento2-module",
+    "license": "MIT",
+    "require": {
+        "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
+        "magento/framework": "*",
+        "magento/module-catalog": "*",
+        "magento/module-swatches": "*",
+        "graphcommerce/module-catalog-storefront": "self.version"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "GraphCommerce\\CatalogStorefrontSwatches\\": ""
+        }
+    }
+}

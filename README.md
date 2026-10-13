@@ -4,8 +4,9 @@ Magento keeps the write side: the Admin, the catalog tables and the indexers sta
 are. The catalog reads come from one document per product and store view in OpenSearch:
 the catalog GraphQL queries, and, per store view, the rendered category, search and
 product pages of a Luma or Hyvä theme. A field the documents do not carry is answered by
-the core resolver of that field, so the storefront code and the GraphQL schema stay the
-same.
+the core resolver of that field, so the storefront code stays the same. The GraphQL schema
+gets only the fields of the required GraphQL Catalog package
+([Fields the package adds](#fields-the-package-adds)), which both paths answer.
 
 [`magento/commerce-data-export`](https://github.com/magento/commerce-data-export) is
 Adobe's exporter: it turns the catalog into feed rows for Adobe's SaaS services, as
@@ -20,7 +21,9 @@ documents use that same connection through core's OpenSearch client.
 `magento/commerce-data-export` 103.4 or later comes from repo.magento.com, or from the
 Mage-OS fork [mage-os/mageos-commerce-data-export](https://github.com/mage-os/mageos-commerce-data-export),
 which an install without Adobe keys adds as composer `path` repositories, as
-[.github/workflows/ci.yml](.github/workflows/ci.yml) does.
+[.github/workflows/ci.yml](.github/workflows/ci.yml) does. The package requires
+[`graphcommerce/magento-graphql-catalog`](https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog);
+a project that installs from git adds that repository next to this one.
 
 1. Install the package and compile. Composer autoload registers every module, and
    `setup:upgrade` enables them.
@@ -221,7 +224,8 @@ runs core alone.
 | `products` search, filter and sort | `...GraphQl` | every selected product |
 | `categories`, `categoryList`, a product's `categories` | `...GraphQl` | supported category filters and page bounds |
 | `aggregations`, layered navigation labels, price step | `...GraphQl`, base | store attributes and selected categories |
-| `custom_attributesV2`, `attributesList` | `...GraphQl` | supported attribute filters |
+| `custom_attributesV2`, `custom_attributeV2`, `attributesList`, the `attribute` of a value or an aggregation | `...GraphQl` | supported attribute filters, the attribute document of the code |
+| `swatch` of an aggregation option, an attribute option and a selected option | `...SwatchesGraphQl` | the attribute documents |
 | `media_gallery`, `url_rewrites` | `...GraphQl` | media URLs and URL rewrites |
 | `related_products`, `upsell_products`, `crosssell_products` | `...GraphQl` | linked products |
 | `price_range`, `price`, `price_tiers`, `tier_prices`, `fixed_product_taxes` | `...PriceGraphQl` | prices; composite fixed product taxes raise an error |
@@ -236,6 +240,19 @@ runs core alone.
 | A configurable's children, super attributes and lowest price on a rendered page | `...ConfigurableProductFrontend` | variant documents and configurable attributes |
 | Bundle options, selections and price ranges on a rendered page | `...BundleProductFrontend` | child documents, price rows and stock limits |
 | Grouped children and quantity validation on a rendered page | `...GroupedProductFrontend` | child documents and stock limits |
+
+## Fields the package adds
+
+The package requires [GraphCommerce GraphQL Catalog](https://github.com/graphcommerce-org/magento2-GraphCommerce_GraphQlCatalog)
+(`graphcommerce/magento-graphql-catalog`), which defines these fields and answers them from
+core. The read model serves them from documents; `X-Catalog-Storefront: core` gets core's
+answer, and the parity gate compares both paths (`dev/parity/queries/34-*` and `35-*`).
+
+| Field | Defined by | Served from documents by |
+| --- | --- | --- |
+| `ProductInterface.custom_attributeV2(attribute_code)` | `GraphQlCatalog` | `...GraphQl` (the `custom_attributesV2` plugin) |
+| `AttributeValueInterface.attribute`, `Aggregation.attribute` | `GraphQlCatalog` | `...GraphQl` |
+| `swatch` on `AggregationOptionInterface`, `CustomAttributeOptionInterface`, `AttributeSelectedOptionInterface` | `GraphQlCatalogSwatches` | `...Swatches` / `...SwatchesGraphQl` |
 
 ## Reference
 
@@ -479,7 +496,7 @@ the base module and the GraphQl module.
 | [`...GraphQlApi`](src/CatalogStorefrontGraphQlApi) | The GraphQL contracts: prefillers, hydration, parity judges |
 | [`...OpenSearch`](src/CatalogStorefrontOpenSearch) | The document stores on OpenSearch, through core's client |
 | [`GraphCommerce_CatalogStorefront`](src/CatalogStorefront) | Feed delivery with the cache purge, the writers of the products, prices, categories, attributes and scopes feeds, documents to models, the fallback report, the storefront key, the rebuild and status commands |
-| [`...GraphQl`](src/CatalogStorefrontGraphQl) | Listings, layered navigation, categories, media, URL rewrites, custom attributes, linked products, the request path, the parity command |
+| [`...GraphQl`](src/CatalogStorefrontGraphQl) | Listings, layered navigation, categories, media, URL rewrites, custom attributes and one by code, linked products, the request path, the parity command |
 | [`...Price`](src/CatalogStorefrontPrice) / [`...PriceGraphQl`](src/CatalogStorefrontPriceGraphQl) | Display currency and tax at read time through core's tax service / the prices prefiller and the customer's tax address |
 | [`...Inventory`](src/CatalogStorefrontInventory) / [`...InventoryGraphQl`](src/CatalogStorefrontInventoryGraphQl) | The stock slice / the stock fields |
 | [`...ConfigurableProduct`](src/CatalogStorefrontConfigurableProduct) / [`...GraphQl`](src/CatalogStorefrontConfigurableProductGraphQl) / [`...Frontend`](src/CatalogStorefrontConfigurableProductFrontend) | Variants and the configurable range / options, variants, selection / a configurable on a rendered page |
@@ -487,6 +504,7 @@ the base module and the GraphQl module.
 | [`...GroupedProduct`](src/CatalogStorefrontGroupedProduct) / [`...GraphQl`](src/CatalogStorefrontGroupedProductGraphQl) / [`...Frontend`](src/CatalogStorefrontGroupedProductFrontend) | Grouped range / grouped items / rendered children and quantity validation |
 | [`...Downloadable`](src/CatalogStorefrontDownloadable) / [`...GraphQl`](src/CatalogStorefrontDownloadableGraphQl) | The downloadable range / links and samples |
 | [`...Review`](src/CatalogStorefrontReview) / [`...GraphQl`](src/CatalogStorefrontReviewGraphQl) / [`...Frontend`](src/CatalogStorefrontReviewFrontend) | Review and rating feeds / rating summary, breakdown and reviews / the rating collection of the rendered review form |
+| [`...Swatches`](src/CatalogStorefrontSwatches) / [`...GraphQl`](src/CatalogStorefrontSwatchesGraphQl) | The swatch of every option on the attribute documents / the `swatch` fields of GraphQL Catalog from them |
 | [`...QuoteGraphQl`](src/CatalogStorefrontQuoteGraphQl) | The display fields of a cart item's product |
 | [`...WishlistGraphQl`](src/CatalogStorefrontWishlistGraphQl) | Wish list item products, one document request per list |
 | [`...SalesGraphQl`](src/CatalogStorefrontSalesGraphQl) | Order item products, one document request per order |
