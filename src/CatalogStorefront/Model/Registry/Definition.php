@@ -12,7 +12,8 @@ class Definition
     public const KINDS = ['views', 'sources', 'books', 'stocks', 'layers', 'policies'];
     public const LABELS = ['views' => 'Catalog View', 'sources' => 'Catalog Source', 'books' => 'Price Book',
         'stocks' => 'Stock', 'layers' => 'Catalog Layer', 'policies' => 'Catalog Policy'];
-    public function __construct(private readonly Platform $platform)
+    /** @param array<string, array<string, array>> $fields the fields an extension adds to a kind, after its own (di.xml) */
+    public function __construct(private readonly Platform $platform, private readonly array $fields = [])
     {
     }
     public function table(string $kind): string
@@ -46,7 +47,6 @@ class Definition
                 'protection' => ['label' => 'Protection','element' => 'select','options' => ['public' => 'Public','private' => 'Private'],'default' => 'public'],
                 'book_mode' => ['label' => 'Price Book Selection','element' => 'select','options' => ['all' => 'All available books','selected' => 'Selected books','single' => 'Single book'],'default' => 'all'],
                 'book_ids' => ['label' => 'Price Books','element' => 'multiselect','options' => 'books'],
-                'reference_book_ids' => ['label' => 'Reference Price Books','element' => 'multiselect','options' => 'books','notice' => 'Books whose prices a product shows next to the selected Book. Filtering, sorting and facets use the selected Book only.'],
                 'layer_ids' => ['label' => 'Layers in Resolution Order','element' => 'ordered','options' => 'layers'],
                 'policy_ids' => ['label' => 'Catalog Policies','element' => 'multiselect','options' => 'policies'],
                 'native_store_id' => $nativeStore + ['types' => ['platform_store_view'],'required' => true],
@@ -86,6 +86,6 @@ class Definition
                 'trigger' => ['label' => 'Trigger Name','element' => 'input','notice' => 'Required when Value Source is Trigger.','types' => ['generic']],
                 'native_store_id' => $nativeStore + ['types' => ['platform_stock_visibility'],'required' => true],
             ],
-        };
+        } + ($this->fields[$kind] ?? []);
     }
 }

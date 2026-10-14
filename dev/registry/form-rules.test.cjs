@@ -13,7 +13,7 @@ function form(kind, values, id=0, editable=true) {
     let definition;const requests=[];
     const jquery={getJSON(url,parameters){const request={parameters,done(fn){this.success=fn;return this;},fail(fn){this.failure=fn;return this;},abort(){this.aborted=true;this.failure?.({},'abort');}};requests.push(request);return request;}};
     const fields={};
-    const names=['type','enabled','name','code','source_id','stock_id','protection','book_mode','book_ids','book_id','reference_book_ids','layer_ids','policy_ids','native_store_id','parent_id','attribute','option_values','values','trigger','value_source','operator'];
+    const names=['type','extension_field','enabled','name','code','source_id','stock_id','protection','book_mode','book_ids','book_id','layer_ids','policy_ids','native_store_id','parent_id','attribute','option_values','values','trigger','value_source','operator'];
     names.forEach(name=>fields[name]={value:observable(values[name]??''),visible:observable(true),disabled:observable(false),error:observable(false),setOptions(options){this.options=options;}});
     const registry={get(names,callback){callback(...names.map(name=>fields[name.split('.').at(-1)]));}};
     vm.runInNewContext(script,{define(deps,factory){definition=factory({extend:value=>value},registry,jquery,value=>value);}});
@@ -23,7 +23,7 @@ function form(kind, values, id=0, editable=true) {
 test('managed View exposes only Store View and freezes saved type',()=>{
     const {fields:f}=form('views',{type:'platform_store_view',book_mode:'selected'},7);
     assert.equal(f.type.disabled(),true);assert.equal(f.native_store_id.visible(),true);
-    ['name','code','source_id','stock_id','protection','book_mode','book_ids','book_id','reference_book_ids','layer_ids','policy_ids','enabled'].forEach(name=>assert.equal(f[name].visible(),false,name));
+    ['name','code','source_id','stock_id','protection','book_mode','book_ids','book_id','layer_ids','policy_ids','enabled','extension_field'].forEach(name=>assert.equal(f[name].visible(),false,name));
 });
 test('private View keeps selected Books and permits a single Book',()=>{
     const {fields:f}=form('views',{type:'generic',protection:'public',book_mode:'all'});
