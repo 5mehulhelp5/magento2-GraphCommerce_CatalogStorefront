@@ -27,8 +27,8 @@ define(['Magento_Ui/js/form/components/fieldset', 'uiRegistry', 'jquery', 'mage/
                 if (this.resourceKind === 'views') {
                     nativeView = f.type.value() === 'platform_store_view';
                     f.type.disabled(!this.editable || this.resourceId > 0);
-                    ['enabled', 'name', 'code', 'source_id', 'stock_id', 'protection', 'book_mode', 'book_ids', 'book_id', 'reference_book_ids', 'layer_ids', 'policy_ids'].forEach(function (name) { f[name].visible(!nativeView); });
-                    f.native_store_id.visible(nativeView);
+                    // A Store View binding derives every other field of the View, an extension's fields included.
+                    Object.keys(f).forEach(function (name) { if (name !== 'type') f[name].visible(name === 'native_store_id' ? nativeView : !nativeView); });
                     if (!nativeView) {
                         privateView = f.protection.value() === 'private';
                         if (privateView && f.book_mode.value() === 'all') f.book_mode.value('selected');

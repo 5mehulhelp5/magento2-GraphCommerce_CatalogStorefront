@@ -64,6 +64,16 @@ final class ResourceFormTest extends TestCase
         self::assertSame('catalog_storefront_resource_form.resource_form_data_source:data.source_id', $picker['imports']['sourceSelection']);
     }
 
+    public function testAnExtensionFieldFollowsTheFieldsOfItsKind(): void
+    {
+        $meta = $this->form('views', fields: ['views' => ['extension_ids' => ['label' => 'Extension', 'element' => 'multiselect', 'options' => 'books', 'notice' => 'Added.']]])
+            ->getMeta()['general']['children'];
+        $config = $meta['extension_ids']['arguments']['data']['config'];
+        self::assertSame('Added.', $config['notice']);
+        self::assertGreaterThan($meta['policy_ids']['arguments']['data']['config']['sortOrder'], $config['sortOrder']);
+        self::assertArrayNotHasKey('extension_ids', $this->form('layers', fields: ['views' => ['extension_ids' => ['element' => 'input']]])->getMeta()['general']['children']);
+    }
+
     public function testReadOnlyCapabilityKeepsAllNewControlsDisabled(): void
     {
         $meta = $this->form('layers', false)->getMeta()['general']['children'];
@@ -95,7 +105,7 @@ final class ResourceFormTest extends TestCase
         return [['layers', 'fields', 'operation'], ['views', 'layer_ids', 'resource_id'], ['stocks', 'locations', 'code']];
     }
 
-    private function form(string $kind, bool $editable = true): ResourceForm
+    private function form(string $kind, bool $editable = true, array $fields = []): ResourceForm
     {
         $repository = $this->createStub(ConfigurationInterface::class);
         $repository->method('capabilities')->willReturn(['can_manage' => $editable]);
@@ -109,7 +119,7 @@ final class ResourceFormTest extends TestCase
         $authorization = $this->createStub(AuthorizationInterface::class); $authorization->method('isAllowed')->willReturn(true);
         $url = $this->createStub(UrlInterface::class); $url->method('getUrl')->willReturn('/metadata');
         $metadata = $this->createMock(SourceMetadataInterface::class); $metadata->expects(self::never())->method('describe');
-        return new ResourceForm('resource_form_data_source', 'id', 'id', $repository, new Definition($platform), $options, $request,
+        return new ResourceForm('resource_form_data_source', 'id', 'id', $repository, new Definition($platform, $fields), $options, $request,
             $this->createStub(DataPersistorInterface::class), $authorization, $url, $metadata);
     }
 }
