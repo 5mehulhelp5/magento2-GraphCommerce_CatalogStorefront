@@ -165,6 +165,8 @@ class ResourceFromDocumentsTest extends TestCase
         $root = $this->createMock(Category::class);
         $root->method('getStoreId')->willReturn(1);
         $root->expects($this->once())->method('addData')->with(['entity_id' => Category::TREE_ROOT_ID, 'parent_id' => 0, 'path' => '1', 'level' => 0]);
+        $root->expects($this->once())->method('setOrigData');
+        $root->expects($this->once())->method('setHasDataChanges')->with(false);
 
         $plugin->aroundLoad($this->createMock(CategoryResource::class), $this->proceed(), $root, Category::TREE_ROOT_ID);
 
