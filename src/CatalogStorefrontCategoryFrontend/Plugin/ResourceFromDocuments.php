@@ -44,6 +44,8 @@ class ResourceFromDocuments
             // category's parents reads its level only, to stop there.
             $object->addData(['entity_id' => Category::TREE_ROOT_ID, 'parent_id' => 0, 'path' => (string)Category::TREE_ROOT_ID, 'level' => 0]);
             $object->setStoreId($storeId);
+            $object->setOrigData();
+            $object->setHasDataChanges(false);
             $object->isObjectNew(false);
 
             return $subject;

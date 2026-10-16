@@ -31,6 +31,7 @@ class CategoryDocumentsTest extends TestCase
             function () {
                 $category = $this->getMockBuilder(Category::class)->disableOriginalConstructor()->onlyMethods(['getResource'])->getMock();
                 $category->method('getResource')->willReturn($this->createMock(\Magento\Catalog\Model\ResourceModel\Category::class));
+                $category->setIdFieldName('entity_id');
 
                 return $category;
             }
@@ -78,5 +79,21 @@ class CategoryDocumentsTest extends TestCase
         $this->assertSame('/media/catalog/category/hurley.png', $category->getData('image'));
         $this->assertSame('10', $category->getData(CategoryDocuments::DOCUMENT_KEY)['categoryId']);
         $this->assertSame(1, $category->getStoreId());
+    }
+
+    public function testABuiltCategoryHasNoChangesAndCarriesOnlyItsOwnCacheTag(): void
+    {
+        $documents = $this->documents([25 => [
+            'categoryId' => '25',
+            'path' => '1/2/24/25',
+            'isAnchor' => true,
+            'isActive' => true,
+            'includeInMenu' => true,
+        ]]);
+
+        $category = $documents->models('default', 1, [25])[25];
+
+        $this->assertFalse($category->hasDataChanges());
+        $this->assertSame(['cat_c_25'], $category->getIdentities());
     }
 }

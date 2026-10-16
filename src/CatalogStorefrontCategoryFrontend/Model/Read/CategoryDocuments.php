@@ -78,6 +78,9 @@ class CategoryDocuments implements ResetAfterRequestInterface
             );
             $category->setData('request_path', $urlPath . $suffix);
         }
+        // A category from core's load has no changes, and getIdentities() adds a cache tag for each change.
+        $category->setOrigData();
+        $category->setHasDataChanges(false);
 
         return $category;
     }
