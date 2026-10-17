@@ -1,0 +1,20 @@
+# The url rewrite lookups of rendered pages, on both paths:
+#   bin/magento catalog-storefront:parity:listing <base url> --pages <this file>
+# One path per line, relative to the base URL. Blank lines and # comments ignored.
+# A line that starts with an HTTP status names a redirect: both paths must send it
+# to the same location. {category_suffix} and {product_suffix} are the store's URL
+# suffixes. The custom rewrites come from dev/parity/fixtures/url-rewrites.php.
+
+# A category, and a product in it: the product rewrite and the category rewrite joined.
+/women/tops-women{category_suffix}
+/women/tops-women/breathe-easy-tank{product_suffix}
+
+# Another form of a stored path: a permanent redirect to the stored path.
+301 /Women/Tops-Women{category_suffix}
+301 /women/tops-women{category_suffix}/
+
+# A custom permanent redirect, and a custom rewrite with an accent in its request path,
+# asked for encoded as stored and in another case without the accent.
+301 /gc-parity-redirect.html
+/gc-parit%C3%A9.html
+301 /GC-PARITE.html

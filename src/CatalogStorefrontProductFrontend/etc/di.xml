@@ -45,12 +45,6 @@
                 type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Listing\SpecialPriceMapFromDocuments"/>
     </type>
 
-    <!-- The product URL rewrites of a document listing come from the documents. -->
-    <type name="Magento\UrlRewrite\Model\UrlFinderInterface">
-        <plugin name="graphcommerce_catalog_storefront_product_url_rewrites"
-                type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Listing\UrlRewritesFromDocuments" sortOrder="-100"/>
-    </type>
-
     <!-- The filterable attributes of the layered navigation come from the attribute documents. -->
     <type name="Magento\Catalog\Model\Layer\FilterableAttributeListInterface">
         <plugin name="graphcommerce_catalog_storefront_filterable_attributes"

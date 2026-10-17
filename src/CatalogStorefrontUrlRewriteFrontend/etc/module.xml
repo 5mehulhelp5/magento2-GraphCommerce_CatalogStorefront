@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="GraphCommerce_CatalogStorefrontUrlRewriteFrontend">
+        <sequence>
+            <module name="GraphCommerce_CatalogStorefront"/>
+            <module name="GraphCommerce_CatalogStorefrontUrlRewrite"/>
+            <module name="GraphCommerce_CatalogStorefrontProductFrontend"/>
+            <module name="Magento_UrlRewrite"/>
+            <module name="Magento_CatalogUrlRewrite"/>
+        </sequence>
+    </module>
+</config>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <!-- The triggers see every write of the two tables, through any service or plain SQL. -->
+    <view id="catalog_storefront_url_rewrites"
+          class="GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexer"
+          group="indexer">
+        <subscriptions>
+            <table name="url_rewrite" entity_column="url_rewrite_id"/>
+            <table name="catalog_url_rewrite_product_category" entity_column="url_rewrite_id"/>
+        </subscriptions>
+    </view>
+</config>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- The url rewrite feed: one row per url rewrite, exported by the indexer after the triggers saw a change. -->
+    <virtualType name="GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexMetadata"
+                 type="Magento\DataExporter\Model\Indexer\FeedIndexMetadata">
+        <arguments>
+            <argument name="feedName" xsi:type="string">urlRewriteRows</argument>
+            <argument name="indexerId" xsi:type="string">catalog_storefront_url_rewrites</argument>
+            <argument name="feedSummary" xsi:type="string">Url Rewrites Feed</argument>
+            <argument name="feedIdentity" xsi:type="string">urlRewriteId</argument>
+            <argument name="sourceTableName" xsi:type="string">url_rewrite</argument>
+            <argument name="sourceTableField" xsi:type="string">url_rewrite_id</argument>
+            <argument name="feedTableName" xsi:type="string">catalog_storefront_url_rewrite_feed</argument>
+            <argument name="feedTableMutableColumns" xsi:type="array">
+                <item name="feed_data" xsi:type="string">feed_data</item>
+                <item name="is_deleted" xsi:type="string">is_deleted</item>
+            </argument>
+            <argument name="entitiesRemovable" xsi:type="boolean">true</argument>
+            <argument name="exportImmediately" xsi:type="boolean">true</argument>
+            <argument name="persistExportedFeed" xsi:type="init_parameter">Magento\DataExporter\Model\ExportFeedInterface::PERSIST_EXPORTED_FEED</argument>
+            <argument name="minimalPayload" xsi:type="array">
+                <item name="urlRewriteId" xsi:type="string">urlRewriteId</item>
+                <item name="storeViewCode" xsi:type="string">storeViewCode</item>
+            </argument>
+            <argument name="feedItemIdentifiers" xsi:type="array">
+                <item name="urlRewriteId" xsi:type="string">urlRewriteId</item>
+                <item name="storeViewCode" xsi:type="string">storeViewCode</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexer"
+                 type="Magento\DataExporter\Model\Indexer\FeedIndexer">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontUrlRewrite\Model\UrlRewriteFeed" type="Magento\DataExporter\Model\Feed">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\DataExporter\Model\FeedPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="urlRewriteRows" xsi:type="string">GraphCommerce\CatalogStorefrontUrlRewrite\Model\UrlRewriteFeed</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\DataExporter\Model\FeedMetadataPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="urlRewriteRows" xsi:type="object">GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexMetadata</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- A store view code is part of every row: a changed store exports the rows again. -->
+    <type name="Magento\DataExporter\Service\IndexInvalidationManager">
+        <arguments>
+            <argument name="invalidationEvents" xsi:type="array">
+                <item name="store_changed" xsi:type="array">
+                    <item name="url_rewrites" xsi:type="string">catalog_storefront_url_rewrites</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="GraphCommerce\CatalogStorefront\Model\Document\Delivery">
+        <arguments>
+            <argument name="writers" xsi:type="array">
+                <item name="urlRewriteRows" xsi:type="array">
+                    <item name="documents" xsi:type="object">GraphCommerce\CatalogStorefrontUrlRewrite\Model\Document\Writer\UrlRewrites</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="GraphCommerce\CatalogStorefront\Model\Feeds">
+        <arguments>
+            <argument name="feeds" xsi:type="array">
+                <item name="url_rewrite" xsi:type="array">
+                    <item name="catalog_storefront_url_rewrites" xsi:type="object">GraphCommerce\CatalogStorefrontUrlRewrite\Model\Indexer\UrlRewriteFeedIndexMetadata</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- A lookup filters on any column of the table: the string columns by their folded key, the
+         others by their value, and the collation document by its kind. -->
+    <type name="GraphCommerce\CatalogStorefrontApi\Storage\EntityMappings">
+        <arguments>
+            <argument name="mappings" xsi:type="array">
+                <item name="url_rewrite" xsi:type="array">
+                    <item name="kind" xsi:type="string">keyword</item>
+                    <item name="url_rewrite_id" xsi:type="string">keyword</item>
+                    <item name="entity_id" xsi:type="string">keyword</item>
+                    <item name="redirect_type" xsi:type="string">keyword</item>
+                    <item name="is_autogenerated" xsi:type="string">keyword</item>
+                    <item name="category_id" xsi:type="string">keyword</item>
+                    <item name="product_id" xsi:type="string">keyword</item>
+                    <item name="entity_type_key" xsi:type="string">keyword</item>
+                    <item name="request_path_key" xsi:type="string">keyword</item>
+                    <item name="target_path_key" xsi:type="string">keyword</item>
+                    <item name="description_key" xsi:type="string">keyword</item>
+                    <item name="metadata_key" xsi:type="string">keyword</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>
