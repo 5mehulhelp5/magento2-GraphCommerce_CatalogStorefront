@@ -278,6 +278,19 @@ passes.
   `entity_id` and a super attribute's `position` are strings, since
   `getJsonConfig()` puts them into the rendered JSON as they are. Without
   the `configurableOptions` field the plugin hands over to core with nothing logged.
+- `CatalogStorefrontUrlRewrite` / `...UrlRewriteFrontend`: the url rewrite table as
+  documents, from the feed `urlRewriteRows` (indexer `catalog_storefront_url_rewrites`,
+  triggers on `url_rewrite` and `catalog_url_rewrite_product_category`, entity `url_rewrite`
+  of `rebuild` and `status`): one document per row in the index of its store view, every
+  string column also as the key the table compares (`Model/Collation`: the general_ci weights,
+  which `dev/url-rewrite/collation-map.php` reads from the database; a table with another
+  collation stops the export, never a read), and per store view the `collation` document,
+  without which a read stops / `Model/Read/UrlFinder` answers core's url rewrite storages on a
+  page served from documents (the plugin is on the table storage, so it wraps the catalog and
+  dynamic storages that extend it, which callers such as the product collection ask directly):
+  the routing, the product and category links, the bulk lookup of a product collection. The
+  route gate is `dev/parity/route-pages.txt` (fixture `dev/parity/fixtures/url-rewrites.php`),
+  whose lines may name the redirect status a page answers with.
 - `CatalogStorefrontElasticsuite`: the `elasticsuite` engine registered with
   core's client resolver on core's own client factory, with
   `Model/Client/Options` answering from `smile_elasticsuite_core_base_settings/

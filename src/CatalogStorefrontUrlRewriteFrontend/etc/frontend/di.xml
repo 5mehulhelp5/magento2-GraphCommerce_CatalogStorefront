@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- On the table storage, so it wraps the catalog and dynamic storages too; before core's
+         dynamic storage plugin on the catalog storage, which it answers for. -->
+    <type name="Magento\UrlRewrite\Model\Storage\DbStorage">
+        <plugin name="graphcommerce_catalog_storefront_url_finder"
+                type="GraphCommerce\CatalogStorefrontUrlRewriteFrontend\Plugin\UrlFinderFromDocuments" sortOrder="-100"/>
+    </type>
+</config>

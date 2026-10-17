@@ -64,7 +64,9 @@
         "graphcommerce/module-catalog-storefront-bundle-product-frontend": "self.version",
         "graphcommerce/module-catalog-storefront-grouped-product-frontend": "self.version",
         "graphcommerce/module-catalog-storefront-swatches": "self.version",
-        "graphcommerce/module-catalog-storefront-swatches-graph-ql": "self.version"
+        "graphcommerce/module-catalog-storefront-swatches-graph-ql": "self.version",
+        "graphcommerce/module-catalog-storefront-url-rewrite": "self.version",
+        "graphcommerce/module-catalog-storefront-url-rewrite-frontend": "self.version"
     },
     "suggest": {
         "ext-simdjson_plus": "GraphCommerce_CatalogStorefrontOpenSearch decodes document store responses about twice as fast",
@@ -118,7 +120,9 @@
             "src/CatalogStorefrontBundleProductFrontend/registration.php",
             "src/CatalogStorefrontGroupedProductFrontend/registration.php",
             "src/CatalogStorefrontSwatches/registration.php",
-            "src/CatalogStorefrontSwatchesGraphQl/registration.php"
+            "src/CatalogStorefrontSwatchesGraphQl/registration.php",
+            "src/CatalogStorefrontUrlRewrite/registration.php",
+            "src/CatalogStorefrontUrlRewriteFrontend/registration.php"
         ],
         "psr-4": {
             "GraphCommerce\\CatalogStorefrontApi\\": "src/CatalogStorefrontApi/",
@@ -157,7 +161,9 @@
             "GraphCommerce\\CatalogStorefrontBundleProductFrontend\\": "src/CatalogStorefrontBundleProductFrontend/",
             "GraphCommerce\\CatalogStorefrontGroupedProductFrontend\\": "src/CatalogStorefrontGroupedProductFrontend/",
             "GraphCommerce\\CatalogStorefrontSwatches\\": "src/CatalogStorefrontSwatches/",
-            "GraphCommerce\\CatalogStorefrontSwatchesGraphQl\\": "src/CatalogStorefrontSwatchesGraphQl/"
+            "GraphCommerce\\CatalogStorefrontSwatchesGraphQl\\": "src/CatalogStorefrontSwatchesGraphQl/",
+            "GraphCommerce\\CatalogStorefrontUrlRewrite\\": "src/CatalogStorefrontUrlRewrite/",
+            "GraphCommerce\\CatalogStorefrontUrlRewriteFrontend\\": "src/CatalogStorefrontUrlRewriteFrontend/"
         }
     }
 }

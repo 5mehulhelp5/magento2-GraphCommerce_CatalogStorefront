@@ -23,7 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * The GraphQL gate next door judges a JSON tree; this one judges HTML, so it
  * compares lines after the per-render tokens are normalised away. Both paths
  * are fetched in one run: the storefront key lets a request name its own path,
- * so nothing has to be reconfigured or restarted between them.
+ * so nothing has to be reconfigured or restarted between them. A page line that
+ * starts with an HTTP status other than 200 names a redirect: both paths must
+ * answer it with that status and the same location.
  */
 class ParityListing extends Command
 {
@@ -92,7 +94,8 @@ class ParityListing extends Command
         foreach (preg_split('/\R/', (string)file_get_contents($file)) ?: [] as $line) {
             $line = trim($line);
             if ($line !== '' && !str_starts_with($line, '#')) {
-                $pages[] = strtr($line, $this->suffixes());
+                $status = preg_match('/^(\d{3})\s+(.+)$/', $line, $matches) ? (int)$matches[1] : 200;
+                $pages[] = [$status, strtr($matches[2] ?? $line, $this->suffixes())];
             }
         }
         if (!$pages) {
@@ -116,7 +119,7 @@ class ParityListing extends Command
         }
 
         $failed = 0;
-        foreach ($pages as $page) {
+        foreach ($pages as [$status, $page]) {
             $url = $base . '/' . ltrim($page, '/');
             foreach ([Mode::CORE, Mode::DOCUMENTS] as $mode) {
                 for ($run = 0; $run < $warm; $run++) {
@@ -137,7 +140,7 @@ class ParityListing extends Command
             }
 
             $verdict = new BufferedOutput($output->getVerbosity(), $output->isDecorated());
-            $failed += $this->judge($verdict, $page, $renders[Mode::CORE], $renders[Mode::DOCUMENTS]) ? 0 : 1;
+            $failed += $this->judge($verdict, $page, $status, $renders[Mode::CORE], $renders[Mode::DOCUMENTS]) ? 0 : 1;
             $output->write($verdict->fetch());
         }
 
@@ -147,11 +150,34 @@ class ParityListing extends Command
     }
 
     /**
+     * @param int $status the HTTP status the page list names for the page, 200 by default
      * @param array{status: int, body: string, url: string, location: string} $core
      * @param array{status: int, body: string, url: string, location: string} $documents
      */
-    private function judge(OutputInterface $output, string $page, array $core, array $documents): bool
+    private function judge(OutputInterface $output, string $page, int $status, array $core, array $documents): bool
     {
+        if ($status !== 200) {
+            // A redirect is parity only where the list names it, so a harness that gets
+            // redirected (a missing proxy header) still fails every page.
+            if ($core['status'] === $status && $documents['status'] === $status
+                && $core['location'] !== '' && $core['location'] === $documents['location']
+            ) {
+                $output->writeln(sprintf('<info>%s: identical HTTP %d</info> -> %s', $page, $status, $core['location']));
+
+                return true;
+            }
+            $output->writeln(sprintf(
+                '<error>%s: expected HTTP %d</error> core %d -> %s, documents %d -> %s',
+                $page,
+                $status,
+                $core['status'],
+                $core['location'],
+                $documents['status'],
+                $documents['location']
+            ));
+
+            return false;
+        }
         // A page that did not render is never parity, even when both paths fail alike.
         foreach ([Mode::CORE => $core, Mode::DOCUMENTS => $documents] as $mode => $render) {
             if ($render['status'] === 0) {
