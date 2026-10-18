@@ -11,5 +11,7 @@ and its `X-Catalog-Storefront` header. Frontend area only.
   `hasChildren()` from the documents of the levels below.
 - [`Model/Read/CategoryDocuments`](Model/Read/CategoryDocuments.php) reads each document once
   per request.
+- [`Model/LoadedCollection`](Model/LoadedCollection.php) holds the built children. A caller that
+  clears it and loads it again gets the same categories back: its select carries no filter.
 
 A category without a document loads from the database.
