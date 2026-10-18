@@ -295,6 +295,18 @@ passes.
   the routing, the product and category links, the bulk lookup of a product collection. The
   route gate is `dev/parity/route-pages.txt` (fixture `dev/parity/fixtures/url-rewrites.php`),
   whose lines may name the redirect status a page answers with.
+- `CatalogStorefrontSnowdogMenu`: Snowdog_Menu's menus as documents from the feed `snowdogMenus`
+  (indexer `catalog_storefront_snowdog_menus`, entity `snowdog_menu` of `rebuild` and `status`;
+  triggers on the menu, store and node tables, and through `Model/Mview/MenuLookupSubscription` on
+  the tables whose rows name no menu, the node customer groups and the CMS pages and blocks with
+  their store rows): a document per active menu in each store view it is assigned to, directly or
+  through store 0, with the CMS rows its CMS nodes name and a marker per store view, and the
+  categories feed field `menuProductCount` (the rows of the category in the category product index
+  of the store view) / the menu, its nodes and the data of every node type of a rendered page, from
+  those documents, the url rewrite documents, the category documents and the product documents,
+  under the ProductFrontend mode, so a menu renders without SQL. A product node's price is the price
+  its listing card advertises, not the price index's minimal price core's Snowdog reads.
+  `registration.php` registers the module only where Snowdog_Menu's code is installed.
 - `CatalogStorefrontElasticsuite`: the `elasticsuite` engine registered with
   core's client resolver on core's own client factory, with
   `Model/Client/Options` answering from `smile_elasticsuite_core_base_settings/
@@ -397,8 +409,11 @@ registers all modules through composer autoload.
   its renders change per request, needs no module of its own.
   Such a module MUST stay inert where its engine or theme is absent: the
   ElasticSuite module registers an engine core never selects without
-  ElasticSuite, and the listing modules act only on a collection or product
-  that carries a document, under a setting that is off by default.
+  ElasticSuite, the listing modules act only on a collection or product
+  that carries a document, under a setting that is off by default, and the
+  Snowdog menu module registers itself only where Snowdog_Menu's code is
+  installed, since its plugins, feed and triggers name Snowdog's classes and
+  tables.
 
 ## Writing rules
 

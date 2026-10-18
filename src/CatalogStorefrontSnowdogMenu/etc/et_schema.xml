@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_DataExporter:etc/et_schema.xsd">
+    <!-- One menu with its store views and its nodes, each node with its customer groups. Every column
+         is a string as the table gives it and a null column is left out, so a document holds the rows
+         core's collections load. The provider runs the query of etc/query.xml named after the field,
+         in the form immediate export requires. -->
+    <record name="Export">
+        <field name="snowdogMenus" type="SnowdogMenu" repeated="true"
+               provider="GraphCommerce\CatalogStorefront\Model\DataExporter\Processor\Scopes">
+            <using field="menuId"/>
+        </field>
+    </record>
+    <record name="SnowdogMenu">
+        <field name="menuId" type="ID"/>
+        <field name="title" type="String"/>
+        <field name="identifier" type="String"/>
+        <field name="creationTime" type="String"/>
+        <field name="updateTime" type="String"/>
+        <field name="isActive" type="String"/>
+        <field name="cssClass" type="String"/>
+        <field name="stores" type="SnowdogMenuStore" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\MenuStores">
+            <using field="menuId"/>
+        </field>
+        <field name="nodes" type="SnowdogMenuNode" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\MenuNodes">
+            <using field="menuId"/>
+        </field>
+    </record>
+    <record name="SnowdogMenuStore">
+        <field name="menuId" type="String"/>
+        <field name="storeId" type="String"/>
+        <field name="storeViewCode" type="String"/>
+    </record>
+    <record name="SnowdogMenuNode">
+        <field name="nodeId" type="ID"/>
+        <field name="menuId" type="String"/>
+        <field name="type" type="String"/>
+        <field name="content" type="String"/>
+        <field name="classes" type="String"/>
+        <field name="parentId" type="String"/>
+        <field name="position" type="String"/>
+        <field name="level" type="String"/>
+        <field name="title" type="String"/>
+        <field name="creationTime" type="String"/>
+        <field name="updateTime" type="String"/>
+        <field name="isActive" type="String"/>
+        <field name="target" type="String"/>
+        <field name="submenuTemplate" type="String"/>
+        <field name="nodeTemplate" type="String"/>
+        <field name="image" type="String"/>
+        <field name="imageAltText" type="String"/>
+        <field name="selectedItemId" type="String"/>
+        <field name="imageWidth" type="String"/>
+        <field name="imageHeight" type="String"/>
+        <field name="hideIfEmpty" type="String"/>
+        <field name="customerGroups" type="SnowdogMenuNodeCustomerGroup" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCustomerGroups">
+            <using field="nodeId"/>
+        </field>
+        <field name="cmsPages" type="SnowdogMenuNodeCmsPage" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCmsPages">
+            <using field="nodeId"/>
+        </field>
+        <field name="cmsBlocks" type="SnowdogMenuNodeCmsBlock" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCmsBlocks">
+            <using field="nodeId"/>
+        </field>
+    </record>
+    <record name="SnowdogMenuNodeCustomerGroup">
+        <field name="nodeId" type="String"/>
+        <field name="groupId" type="String"/>
+    </record>
+    <!-- An active page that a CMS page node names, once per store the page is assigned to. -->
+    <record name="SnowdogMenuNodeCmsPage">
+        <field name="nodeId" type="String"/>
+        <field name="pageId" type="String"/>
+        <field name="identifier" type="String"/>
+        <field name="storeId" type="String"/>
+    </record>
+    <!-- An active block that a CMS block node names, once per store the block is assigned to. -->
+    <record name="SnowdogMenuNodeCmsBlock">
+        <field name="nodeId" type="String"/>
+        <field name="identifier" type="String"/>
+        <field name="content" type="String"/>
+        <field name="storeId" type="String"/>
+    </record>
+    <!-- The count a category node of a menu reads to hide a category without products. -->
+    <record name="Category">
+        <field name="menuProductCount" type="Int"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\CategoryIndexProductCount">
+            <using field="categoryId"/>
+            <using field="storeViewCode"/>
+        </field>
+    </record>
+</config>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <!-- The triggers see every write of the menu tables and of the pages and blocks the CMS nodes name,
+         through the admin, an import or plain SQL. A row that names no menu (a node's customer group, a
+         page, a block and their store rows) marks the menus the subscription looks up for it. -->
+    <view id="catalog_storefront_snowdog_menus"
+          class="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexer"
+          group="indexer">
+        <subscriptions>
+            <table name="snowmenu_menu" entity_column="menu_id"/>
+            <table name="snowmenu_store" entity_column="menu_id"/>
+            <table name="snowmenu_node" entity_column="menu_id"/>
+            <table name="snowmenu_customer" entity_column="node_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\MenuLookupSubscription"/>
+            <table name="cms_page" entity_column="page_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\MenuLookupSubscription"/>
+            <table name="cms_page_store" entity_column="page_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\MenuLookupSubscription"/>
+            <table name="cms_block" entity_column="block_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\MenuLookupSubscription"/>
+            <table name="cms_block_store" entity_column="block_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\MenuLookupSubscription"/>
+        </subscriptions>
+    </view>
+    <!-- A product joins or leaves a category: the categories feed exports the category again with its count. -->
+    <view id="cde_categories_feed" class="Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexer" group="indexer">
+        <subscriptions>
+            <table name="catalog_category_product" entity_column="category_id"/>
+        </subscriptions>
+    </view>
+</config>

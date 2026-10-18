@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="catalog_storefront_snowdog_menus"
+             view_id="catalog_storefront_snowdog_menus"
+             class="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexer">
+        <title translate="true">Catalog Storefront Snowdog Menus Feed</title>
+        <description translate="true">Exports the Snowdog menus and their nodes to the catalog storefront documents</description>
+    </indexer>
+</config>

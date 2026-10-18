@@ -23,7 +23,7 @@ area only; GraphQL reads the table.
   order. Whether a product shows in a category comes from the `categoryIds` of its product
   document, the category product index of the store view. A lookup is read once per request.
 
-A module that reads the `url_rewrite` table with its own SQL, as the Snowdog menu does, still
-reads the table.
+A module that reads the `url_rewrite` table with its own SQL still reads the table; the Snowdog
+menu's read is served by GraphCommerce_CatalogStorefrontSnowdogMenu.
 
 Parity: `dev/parity/route-pages.txt` with the fixture `dev/parity/fixtures/url-rewrites.php`.

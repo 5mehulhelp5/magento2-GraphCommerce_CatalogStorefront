@@ -66,7 +66,8 @@
         "graphcommerce/module-catalog-storefront-swatches": "self.version",
         "graphcommerce/module-catalog-storefront-swatches-graph-ql": "self.version",
         "graphcommerce/module-catalog-storefront-url-rewrite": "self.version",
-        "graphcommerce/module-catalog-storefront-url-rewrite-frontend": "self.version"
+        "graphcommerce/module-catalog-storefront-url-rewrite-frontend": "self.version",
+        "graphcommerce/module-catalog-storefront-snowdog-menu": "self.version"
     },
     "suggest": {
         "ext-simdjson_plus": "GraphCommerce_CatalogStorefrontOpenSearch decodes document store responses about twice as fast",
@@ -80,7 +81,8 @@
         "magento/module-swatches-graph-ql": "GraphCommerce_CatalogStorefrontSwatchesGraphQl serves the swatches of GraphCommerce_GraphQlCatalogSwatches from documents",
         "magento/module-downloadable-graph-ql": "GraphCommerce_CatalogStorefrontDownloadable serves downloadable links and samples",
         "smile/elasticsuite": "GraphCommerce_CatalogStorefrontElasticsuite points the document store at the cluster ElasticSuite is configured with",
-        "mage-os/module-profiler": "GraphCommerce_CatalogStorefrontProfiler times the document store client in a trace"
+        "mage-os/module-profiler": "GraphCommerce_CatalogStorefrontProfiler times the document store client in a trace",
+        "snowdog/module-menu": "GraphCommerce_CatalogStorefrontSnowdogMenu serves the menus of a rendered page from documents"
     },
     "autoload": {
         "files": [
@@ -122,7 +124,8 @@
             "src/CatalogStorefrontSwatches/registration.php",
             "src/CatalogStorefrontSwatchesGraphQl/registration.php",
             "src/CatalogStorefrontUrlRewrite/registration.php",
-            "src/CatalogStorefrontUrlRewriteFrontend/registration.php"
+            "src/CatalogStorefrontUrlRewriteFrontend/registration.php",
+            "src/CatalogStorefrontSnowdogMenu/registration.php"
         ],
         "psr-4": {
             "GraphCommerce\\CatalogStorefrontApi\\": "src/CatalogStorefrontApi/",
@@ -163,7 +166,8 @@
             "GraphCommerce\\CatalogStorefrontSwatches\\": "src/CatalogStorefrontSwatches/",
             "GraphCommerce\\CatalogStorefrontSwatchesGraphQl\\": "src/CatalogStorefrontSwatchesGraphQl/",
             "GraphCommerce\\CatalogStorefrontUrlRewrite\\": "src/CatalogStorefrontUrlRewrite/",
-            "GraphCommerce\\CatalogStorefrontUrlRewriteFrontend\\": "src/CatalogStorefrontUrlRewriteFrontend/"
+            "GraphCommerce\\CatalogStorefrontUrlRewriteFrontend\\": "src/CatalogStorefrontUrlRewriteFrontend/",
+            "GraphCommerce\\CatalogStorefrontSnowdogMenu\\": "src/CatalogStorefrontSnowdogMenu/"
         }
     }
 }

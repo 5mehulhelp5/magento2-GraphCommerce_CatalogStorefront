@@ -506,6 +506,7 @@ the base module and the GraphQl module.
 | [`...GroupedProduct`](src/CatalogStorefrontGroupedProduct) / [`...GraphQl`](src/CatalogStorefrontGroupedProductGraphQl) / [`...Frontend`](src/CatalogStorefrontGroupedProductFrontend) | Grouped range / grouped items / rendered children and quantity validation |
 | [`...Downloadable`](src/CatalogStorefrontDownloadable) / [`...GraphQl`](src/CatalogStorefrontDownloadableGraphQl) | The downloadable range / links and samples |
 | [`...Review`](src/CatalogStorefrontReview) / [`...GraphQl`](src/CatalogStorefrontReviewGraphQl) / [`...Frontend`](src/CatalogStorefrontReviewFrontend) | Review and rating feeds / rating summary, breakdown and reviews / the rating collection of the rendered review form |
+| [`...SnowdogMenu`](src/CatalogStorefrontSnowdogMenu) | Snowdog's menus as documents from a feed, and the menus, nodes and node data of a rendered page from them, every node type. Registered only where Snowdog_Menu is installed |
 | [`...Swatches`](src/CatalogStorefrontSwatches) / [`...GraphQl`](src/CatalogStorefrontSwatchesGraphQl) | The swatch of every option on the attribute documents / the `swatch` fields of GraphQL Catalog from them |
 | [`...QuoteGraphQl`](src/CatalogStorefrontQuoteGraphQl) | The display fields of a cart item's product |
 | [`...WishlistGraphQl`](src/CatalogStorefrontWishlistGraphQl) | Wish list item products, one document request per list |

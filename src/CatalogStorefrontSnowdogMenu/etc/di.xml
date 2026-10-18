@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- The menu feed: one row per menu with its store views and its nodes, exported by the indexer
+         after the triggers saw a change of a menu table. -->
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexMetadata"
+                 type="Magento\DataExporter\Model\Indexer\FeedIndexMetadata">
+        <arguments>
+            <argument name="feedName" xsi:type="string">snowdogMenus</argument>
+            <argument name="indexerId" xsi:type="string">catalog_storefront_snowdog_menus</argument>
+            <argument name="feedSummary" xsi:type="string">Snowdog Menus Feed</argument>
+            <argument name="feedIdentity" xsi:type="string">menuId</argument>
+            <argument name="sourceTableName" xsi:type="string">snowmenu_menu</argument>
+            <argument name="sourceTableField" xsi:type="string">menu_id</argument>
+            <argument name="feedTableName" xsi:type="string">catalog_storefront_snowdog_menu_feed</argument>
+            <argument name="feedTableMutableColumns" xsi:type="array">
+                <item name="feed_data" xsi:type="string">feed_data</item>
+                <item name="is_deleted" xsi:type="string">is_deleted</item>
+            </argument>
+            <argument name="entitiesRemovable" xsi:type="boolean">true</argument>
+            <argument name="exportImmediately" xsi:type="boolean">true</argument>
+            <argument name="persistExportedFeed" xsi:type="init_parameter">Magento\DataExporter\Model\ExportFeedInterface::PERSIST_EXPORTED_FEED</argument>
+            <!-- A menu row names its store views itself: its id alone identifies it. -->
+            <argument name="minimalPayload" xsi:type="array">
+                <item name="menuId" xsi:type="string">menuId</item>
+            </argument>
+            <argument name="feedItemIdentifiers" xsi:type="array">
+                <item name="menuId" xsi:type="string">menuId</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexer"
+                 type="Magento\DataExporter\Model\Indexer\FeedIndexer">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\MenuFeed" type="Magento\DataExporter\Model\Feed">
+        <arguments>
+            <argument name="feedIndexMetadata" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexMetadata</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\MenuStores"
+                 type="Magento\DataExporter\Model\Provider\QueryDataProvider">
+        <arguments>
+            <argument name="queryName" xsi:type="string">snowdogMenuStores</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\MenuNodes"
+                 type="Magento\DataExporter\Model\Provider\QueryDataProvider">
+        <arguments>
+            <argument name="queryName" xsi:type="string">snowdogMenuNodes</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCustomerGroups"
+                 type="Magento\DataExporter\Model\Provider\QueryDataProvider">
+        <arguments>
+            <argument name="queryName" xsi:type="string">snowdogMenuNodeCustomerGroups</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\DataExporter\Model\FeedPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="snowdogMenus" xsi:type="string">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\MenuFeed</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\DataExporter\Model\FeedMetadataPool">
+        <arguments>
+            <argument name="classMap" xsi:type="array">
+                <item name="snowdogMenus" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexMetadata</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Every store view holds the menus of all store views: a new store view needs them written. -->
+    <type name="Magento\DataExporter\Service\IndexInvalidationManager">
+        <arguments>
+            <argument name="invalidationEvents" xsi:type="array">
+                <item name="store_changed" xsi:type="array">
+                    <item name="snowdog_menus" xsi:type="string">catalog_storefront_snowdog_menus</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- The menu block caches its output with the menu's tag, and the admin save purges that tag before
+         the feed exports the menu, so the write purges it again. A category node's tag is cat_c_p, which
+         the categories feed purges for the count a node reads. -->
+    <type name="GraphCommerce\CatalogStorefront\Model\Document\Delivery">
+        <arguments>
+            <argument name="writers" xsi:type="array">
+                <item name="snowdogMenus" xsi:type="array">
+                    <item name="documents" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Document\Writer\Menus</item>
+                </item>
+            </argument>
+            <argument name="identities" xsi:type="array">
+                <item name="snowdogMenus" xsi:type="array">
+                    <item name="snowdog_menu_menu" xsi:type="array">
+                        <item name="menuId" xsi:type="string">menuId</item>
+                    </item>
+                </item>
+                <item name="categories" xsi:type="array">
+                    <item name="cat_c_p" xsi:type="array">
+                        <item name="categoryId" xsi:type="string">categoryId</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- bin/magento catalog-storefront:rebuild snowdog_menu, and its line of catalog-storefront:status. -->
+    <type name="GraphCommerce\CatalogStorefront\Model\Feeds">
+        <arguments>
+            <argument name="feeds" xsi:type="array">
+                <item name="snowdog_menu" xsi:type="array">
+                    <item name="catalog_storefront_snowdog_menus" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexMetadata</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- A store without menus exports no menu row, so the rebuild writes the marker of every store view. -->
+    <type name="GraphCommerce\CatalogStorefront\Console\Command\Rebuild">
+        <arguments>
+            <argument name="seeders" xsi:type="array">
+                <item name="snowdog_menu" xsi:type="array">
+                    <item name="marker" xsi:type="object">GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Document\Writer\Menus</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>
