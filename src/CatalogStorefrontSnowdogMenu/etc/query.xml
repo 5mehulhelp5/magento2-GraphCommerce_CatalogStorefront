@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_QueryXml:etc/query.xsd">
+    <!-- The menu rows of the exported ids. -->
+    <query name="snowdogMenus">
+        <source name="snowmenu_menu">
+            <attribute name="menu_id" alias="menuId"/>
+            <attribute name="title" alias="title"/>
+            <attribute name="identifier" alias="identifier"/>
+            <attribute name="creation_time" alias="creationTime"/>
+            <attribute name="update_time" alias="updateTime"/>
+            <attribute name="is_active" alias="isActive"/>
+            <attribute name="css_class" alias="cssClass"/>
+            <filter glue="and">
+                <condition attribute="menu_id" operator="in" type="placeholder">menuId</condition>
+            </filter>
+        </source>
+    </query>
+    <!-- The store views of the menus with their codes; store 0 stands for every store view. -->
+    <query name="snowdogMenuStores">
+        <source name="snowmenu_store">
+            <attribute name="menu_id" alias="menuId"/>
+            <attribute name="store_id" alias="storeId"/>
+            <link-source name="store" link-type="inner">
+                <attribute name="code" alias="storeViewCode"/>
+                <using glue="and">
+                    <condition attribute="store_id" operator="eq" type="identifier">store_id</condition>
+                </using>
+            </link-source>
+            <filter glue="and">
+                <condition attribute="menu_id" operator="in" type="placeholder">menuId</condition>
+            </filter>
+        </source>
+    </query>
+    <!-- The nodes of the menus, in the order NodeRepository::getByMenu() reads them: by level, parent
+         and position, then by id. -->
+    <query name="snowdogMenuNodes">
+        <source name="snowmenu_node">
+            <attribute name="level" alias="level" sort="asc"/>
+            <attribute name="parent_id" alias="parentId" sort="asc"/>
+            <attribute name="position" alias="position" sort="asc"/>
+            <attribute name="node_id" alias="nodeId" sort="asc"/>
+            <attribute name="menu_id" alias="menuId"/>
+            <attribute name="type" alias="type"/>
+            <attribute name="content" alias="content"/>
+            <attribute name="classes" alias="classes"/>
+            <attribute name="title" alias="title"/>
+            <attribute name="creation_time" alias="creationTime"/>
+            <attribute name="update_time" alias="updateTime"/>
+            <attribute name="is_active" alias="isActive"/>
+            <attribute name="target" alias="target"/>
+            <attribute name="submenu_template" alias="submenuTemplate"/>
+            <attribute name="node_template" alias="nodeTemplate"/>
+            <attribute name="image" alias="image"/>
+            <attribute name="image_alt_text" alias="imageAltText"/>
+            <attribute name="selected_item_id" alias="selectedItemId"/>
+            <attribute name="image_width" alias="imageWidth"/>
+            <attribute name="image_heigth" alias="imageHeight"/>
+            <attribute name="hide_if_empty" alias="hideIfEmpty"/>
+            <filter glue="and">
+                <condition attribute="menu_id" operator="in" type="placeholder">menuId</condition>
+            </filter>
+        </source>
+    </query>
+    <!-- The customer groups of the nodes, in the order of the table's primary key. -->
+    <query name="snowdogMenuNodeCustomerGroups">
+        <source name="snowmenu_customer">
+            <attribute name="node_id" alias="nodeId"/>
+            <attribute name="group_id" alias="groupId" sort="asc"/>
+            <filter glue="and">
+                <condition attribute="node_id" operator="in" type="placeholder">nodeId</condition>
+            </filter>
+        </source>
+    </query>
+</config>

@@ -1,0 +1,32 @@
+{
+    "name": "graphcommerce/module-catalog-storefront-snowdog-menu",
+    "description": "Snowdog's menus as documents from a feed, and their reads on a rendered page from the documents",
+    "type": "magento2-module",
+    "license": "MIT",
+    "require": {
+        "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
+        "magento/framework": "*",
+        "magento/module-catalog": "*",
+        "magento/module-catalog-data-exporter": "*",
+        "magento/module-data-exporter": "*",
+        "magento/module-query-xml": "*",
+        "magento/module-store": "*",
+        "magento/module-url-rewrite": "*",
+        "graphcommerce/module-catalog-storefront": "self.version",
+        "graphcommerce/module-catalog-storefront-api": "self.version",
+        "graphcommerce/module-catalog-storefront-category-frontend": "self.version",
+        "graphcommerce/module-catalog-storefront-product-frontend": "self.version",
+        "graphcommerce/module-catalog-storefront-url-rewrite": "self.version"
+    },
+    "suggest": {
+        "snowdog/module-menu": "The menus this module serves from documents. Without it the module does not register and stays inert."
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "GraphCommerce\\CatalogStorefrontSnowdogMenu\\": ""
+        }
+    }
+}

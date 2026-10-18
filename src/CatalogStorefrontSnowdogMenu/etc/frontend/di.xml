@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Frontend only: the admin and GraphQL read the menu tables. A menu block reads its menu for the
+         store view and for all store views, then its nodes. -->
+    <type name="Snowdog\Menu\Api\MenuRepositoryInterface">
+        <plugin name="graphcommerce_catalog_storefront_snowdog_menu_from_documents"
+                type="GraphCommerce\CatalogStorefrontSnowdogMenu\Plugin\MenuFromDocuments"/>
+    </type>
+    <type name="Snowdog\Menu\Api\NodeRepositoryInterface">
+        <plugin name="graphcommerce_catalog_storefront_snowdog_menu_nodes_from_documents"
+                type="GraphCommerce\CatalogStorefrontSnowdogMenu\Plugin\NodesFromDocuments"/>
+    </type>
+    <!-- The category nodes of a menu read the url rewrites, the categories and the category product index. -->
+    <type name="Snowdog\Menu\Model\NodeType\Category">
+        <plugin name="graphcommerce_catalog_storefront_snowdog_menu_category_nodes_from_documents"
+                type="GraphCommerce\CatalogStorefrontSnowdogMenu\Plugin\CategoryNodesFromDocuments"/>
+    </type>
+</config>

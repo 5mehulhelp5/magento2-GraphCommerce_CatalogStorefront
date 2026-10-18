@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <!-- The triggers see every write of the menu tables, through the admin, an import or plain SQL. A
+         node save that changes only its customer groups writes snowmenu_customer alone, whose rows name
+         the node: the subscription marks the node's menu. -->
+    <view id="catalog_storefront_snowdog_menus"
+          class="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Indexer\MenuFeedIndexer"
+          group="indexer">
+        <subscriptions>
+            <table name="snowmenu_menu" entity_column="menu_id"/>
+            <table name="snowmenu_store" entity_column="menu_id"/>
+            <table name="snowmenu_node" entity_column="menu_id"/>
+            <table name="snowmenu_customer" entity_column="node_id"
+                   subscription_model="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview\NodeGroupsSubscription"/>
+        </subscriptions>
+    </view>
+    <!-- A product joins or leaves a category: the categories feed exports the category again with its count. -->
+    <view id="cde_categories_feed" class="Magento\CatalogDataExporter\Model\Indexer\CategoryFeedIndexer" group="indexer">
+        <subscriptions>
+            <table name="catalog_category_product" entity_column="category_id"/>
+        </subscriptions>
+    </view>
+</config>
