@@ -41,6 +41,7 @@ class Menus implements FeedWriterInterface, RebuildSeederInterface
             $assigned = array_values((array)($row['stores'] ?? []));
             $storeIds = array_map(static fn(array $store): int => (int)$store['storeId'], $assigned);
             $codes = array_column($assigned, 'storeViewCode');
+            $nodes = array_values((array)($row['nodes'] ?? []));
             $document = empty($row['deleted']) && (int)($row['isActive'] ?? 0) === 1 ? [
                 MenuDocument::MENU => $this->columns($row, MenuDocument::MENU_COLUMNS),
                 MenuDocument::STORE_IDS => $storeIds,
@@ -51,8 +52,33 @@ class Menus implements FeedWriterInterface, RebuildSeederInterface
                         return $this->columns($node, MenuDocument::NODE_COLUMNS)
                             + [MenuDocument::CUSTOMER_GROUPS => $groups === [] ? null : implode(',', $groups)];
                     },
-                    array_values((array)($row['nodes'] ?? []))
+                    $nodes
                 ),
+                // Lists, not maps keyed by node: an upsert replaces a list, where it merges a map.
+                MenuDocument::CMS_PAGES => array_merge([], ...array_map(
+                    static fn(array $node): array => array_map(
+                        static fn(array $page): array => [
+                            'nodeId' => (int)$page['nodeId'],
+                            'pageId' => (string)$page['pageId'],
+                            'identifier' => (string)$page['identifier'],
+                            'storeId' => (int)$page['storeId'],
+                        ],
+                        array_values((array)($node['cmsPages'] ?? []))
+                    ),
+                    $nodes
+                )),
+                MenuDocument::CMS_BLOCKS => array_merge([], ...array_map(
+                    static fn(array $node): array => array_map(
+                        static fn(array $block): array => [
+                            'nodeId' => (int)$block['nodeId'],
+                            'identifier' => (string)$block['identifier'],
+                            'content' => $block['content'] ?? null,
+                            'storeId' => (int)$block['storeId'],
+                        ],
+                        array_values((array)($node['cmsBlocks'] ?? []))
+                    ),
+                    $nodes
+                )),
             ] : null;
             foreach ($stores as $store) {
                 if ($document !== null

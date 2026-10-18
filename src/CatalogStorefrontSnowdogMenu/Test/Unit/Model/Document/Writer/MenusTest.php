@@ -69,6 +69,43 @@ class MenusTest extends TestCase
         $this->assertSame(array_values(MenuDocument::NODE_COLUMNS), array_slice(array_keys($document['nodes'][1]), 0, -1));
     }
 
+    public function testTheCmsRowsOfTheNodesAreListsOnTheMenu(): void
+    {
+        [$storage, $upserts] = $this->storage();
+
+        $this->writer($storage)->write([[
+            'menuId' => '3',
+            'isActive' => '1',
+            'stores' => [['menuId' => '3', 'storeId' => '0', 'storeViewCode' => 'admin']],
+            'nodes' => [
+                ['nodeId' => '7', 'menuId' => '3', 'type' => 'cms_page', 'content' => 'about-us', 'cmsPages' => [
+                    ['nodeId' => '7', 'pageId' => '5', 'identifier' => 'about-us', 'storeId' => '0'],
+                    ['nodeId' => '7', 'pageId' => '9', 'identifier' => 'About-Us', 'storeId' => '1'],
+                ]],
+                ['nodeId' => '8', 'menuId' => '3', 'type' => 'cms_block', 'content' => 'promo', 'cmsBlocks' => [
+                    ['nodeId' => '8', 'identifier' => 'promo', 'content' => '<p>Sale</p>', 'storeId' => '0'],
+                    ['nodeId' => '8', 'identifier' => 'promo', 'storeId' => '1'],
+                ]],
+                ['nodeId' => '9', 'menuId' => '3', 'type' => 'custom_url', 'content' => '/sale'],
+            ],
+        ]]);
+
+        $document = $upserts->calls[0][2][3];
+        $this->assertSame([
+            ['nodeId' => 7, 'pageId' => '5', 'identifier' => 'about-us', 'storeId' => 0],
+            ['nodeId' => 7, 'pageId' => '9', 'identifier' => 'About-Us', 'storeId' => 1],
+        ], $document['cmsPages'], 'the identifier as the page holds it');
+        $this->assertSame([
+            ['nodeId' => 8, 'identifier' => 'promo', 'content' => '<p>Sale</p>', 'storeId' => 0],
+            ['nodeId' => 8, 'identifier' => 'promo', 'content' => null, 'storeId' => 1],
+        ], $document['cmsBlocks'], 'a block without content keeps its row');
+        $this->assertSame(
+            [...array_values(MenuDocument::NODE_COLUMNS), MenuDocument::CUSTOMER_GROUPS],
+            array_keys($document['nodes'][0]),
+            'a node row holds its columns only'
+        );
+    }
+
     public function testTheNotLoggedInGroupAloneLimitsANode(): void
     {
         // Group 0 is a group like any other: the node stays limited to it.

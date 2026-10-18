@@ -58,10 +58,32 @@
                provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCustomerGroups">
             <using field="nodeId"/>
         </field>
+        <field name="cmsPages" type="SnowdogMenuNodeCmsPage" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCmsPages">
+            <using field="nodeId"/>
+        </field>
+        <field name="cmsBlocks" type="SnowdogMenuNodeCmsBlock" repeated="true"
+               provider="GraphCommerce\CatalogStorefrontSnowdogMenu\Model\DataExporter\Provider\NodeCmsBlocks">
+            <using field="nodeId"/>
+        </field>
     </record>
     <record name="SnowdogMenuNodeCustomerGroup">
         <field name="nodeId" type="String"/>
         <field name="groupId" type="String"/>
+    </record>
+    <!-- An active page that a CMS page node names, once per store the page is assigned to. -->
+    <record name="SnowdogMenuNodeCmsPage">
+        <field name="nodeId" type="String"/>
+        <field name="pageId" type="String"/>
+        <field name="identifier" type="String"/>
+        <field name="storeId" type="String"/>
+    </record>
+    <!-- An active block that a CMS block node names, once per store the block is assigned to. -->
+    <record name="SnowdogMenuNodeCmsBlock">
+        <field name="nodeId" type="String"/>
+        <field name="identifier" type="String"/>
+        <field name="content" type="String"/>
+        <field name="storeId" type="String"/>
     </record>
     <!-- The count a category node of a menu reads to hide a category without products. -->
     <record name="Category">

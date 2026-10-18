@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace GraphCommerce\CatalogStorefrontSnowdogMenu\Model;
 
-use Snowdog\Menu\Api\Data\NodeInterface;
-
 /**
  * The menu documents of a store view.
  *
@@ -13,6 +11,9 @@ use Snowdog\Menu\Api\Data\NodeInterface;
  * the menu is assigned to; `nodes`, the rows of its nodes in the order the node repository reads them,
  * each with `customer_groups`, the comma separated group ids the node is limited to, as core's
  * collection joins them, or null. Every row is keyed by column, a null column as null.
+ * `cmsPages` and `cmsBlocks` list, per CMS page or CMS block node, the active pages and blocks
+ * whose identifier the node names, as the database compares it, once per store the page or block
+ * is assigned to: the rows the node types read, which the reader narrows to the store view.
  *
  * Document id 0 is the marker of the store view: the menu feed writes it with every batch and the
  * rebuild seeds it, so a store view that holds it has its menu documents.
@@ -23,7 +24,13 @@ class MenuDocument
 
     public const MARKER = 0;
 
-    public const MARKER_DOCUMENT = [self::MENU => [], self::STORE_IDS => [], self::NODES => []];
+    public const MARKER_DOCUMENT = [
+        self::MENU => [],
+        self::STORE_IDS => [],
+        self::NODES => [],
+        self::CMS_PAGES => [],
+        self::CMS_BLOCKS => [],
+    ];
 
     public const MENU = 'menu';
 
@@ -31,7 +38,11 @@ class MenuDocument
 
     public const NODES = 'nodes';
 
-    public const CUSTOMER_GROUPS = NodeInterface::CUSTOMER_GROUPS;
+    public const CMS_PAGES = 'cmsPages';
+
+    public const CMS_BLOCKS = 'cmsBlocks';
+
+    public const CUSTOMER_GROUPS = 'customer_groups';
 
     /** The table column of each field of a menu feed row. */
     public const MENU_COLUMNS = [

@@ -9,6 +9,7 @@ use GraphCommerce\CatalogStorefrontProductFrontend\Model\Mode;
 use GraphCommerce\CatalogStorefrontSnowdogMenu\Model\MenuDocument;
 use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 
 /**
@@ -48,7 +49,7 @@ class MenuDocuments implements ResetAfterRequestInterface
     }
 
     /**
-     * @return array<int, array{menu: array<string, string|null>, storeIds: int[], nodes: array<int, array<string, string|null>>}>
+     * @return array<int, array{menu: array<string, string|null>, storeIds: int[], nodes: array<int, array<string, string|null>>, cmsPages: array[], cmsBlocks: array[]}>
      *         the active menus of the store view and of all store views, by menu id in id order
      * @throws \GraphCommerce\CatalogStorefront\Model\DocumentReadException when the store view has no menu
      *         documents, a document has another shape or the store cannot be read
@@ -70,14 +71,20 @@ class MenuDocuments implements ResetAfterRequestInterface
                     if (!is_string($document[MenuDocument::MENU]['identifier'] ?? null)
                         || !is_array($document[MenuDocument::STORE_IDS] ?? null)
                         || !is_array($document[MenuDocument::NODES] ?? null)
+                        || !is_array($document[MenuDocument::CMS_PAGES] ?? null)
+                        || !is_array($document[MenuDocument::CMS_BLOCKS] ?? null)
                     ) {
                         throw new \UnexpectedValueException(sprintf(
-                            'The document of menu %s in store view "%s" has no %s, %s or %s: run bin/magento catalog-storefront:rebuild %s',
+                            'The document of menu %s in store view "%s" has no %s: run bin/magento catalog-storefront:rebuild %s',
                             $menuId,
                             $storeViewCode,
-                            MenuDocument::MENU,
-                            MenuDocument::STORE_IDS,
-                            MenuDocument::NODES,
+                            implode(', ', [
+                                MenuDocument::MENU,
+                                MenuDocument::STORE_IDS,
+                                MenuDocument::NODES,
+                                MenuDocument::CMS_PAGES,
+                                MenuDocument::CMS_BLOCKS,
+                            ]),
                             MenuDocument::ENTITY
                         ));
                     }
@@ -90,6 +97,43 @@ class MenuDocuments implements ResetAfterRequestInterface
         }
 
         return $this->menus[$storeViewCode];
+    }
+
+    /**
+     * The CMS rows of the nodes of the store view's own store and of all store views (store 0), in
+     * store order: the rows core reads for them, so of two rows of one identifier the later one is the
+     * one core keeps.
+     *
+     * @param \Magento\Framework\DataObject[] $nodes the menu nodes, with their menu id
+     * @param string $kind MenuDocument::CMS_PAGES or MenuDocument::CMS_BLOCKS
+     * @return array<int, array<string, int|string|null>>
+     * @throws \GraphCommerce\CatalogStorefront\Model\DocumentReadException when a node's menu has no document
+     */
+    public function cmsRows(StoreInterface $store, array $nodes, string $kind): array
+    {
+        $storeViewCode = (string)$store->getCode();
+        $menus = $this->menus($storeViewCode);
+        $stores = [Store::DEFAULT_STORE_ID, (int)$store->getId()];
+        $rows = [];
+        foreach ($nodes as $node) {
+            $menu = $menus[(int)$node->getData('menu_id')] ?? null;
+            if ($menu === null) {
+                $this->strict->fallback(self::class, sprintf(
+                    'Menu %d of node %d has no document in store view "%s"',
+                    (int)$node->getData('menu_id'),
+                    (int)$node->getId(),
+                    $storeViewCode
+                ));
+            }
+            foreach ($menu[$kind] as $row) {
+                if ($row['nodeId'] === (int)$node->getId() && in_array($row['storeId'], $stores, true)) {
+                    $rows[] = $row;
+                }
+            }
+        }
+        usort($rows, static fn(array $a, array $b): int => $a['storeId'] <=> $b['storeId']);
+
+        return $rows;
     }
 
     public function _resetState(): void

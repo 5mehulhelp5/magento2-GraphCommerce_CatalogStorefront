@@ -297,14 +297,16 @@ passes.
   whose lines may name the redirect status a page answers with.
 - `CatalogStorefrontSnowdogMenu`: Snowdog_Menu's menus as documents from the feed `snowdogMenus`
   (indexer `catalog_storefront_snowdog_menus`, entity `snowdog_menu` of `rebuild` and `status`;
-  triggers on the menu, store and node tables, and on the customer groups table through
-  `Model/Mview/NodeGroupsSubscription`, which marks the menu of the node): a document per active
-  menu in each store view it is assigned to, directly or through store 0, with a marker per store
-  view, and the categories feed field `menuProductCount` (the rows of the category in the category
-  product index of the store view) / the menu, its nodes and its category nodes of a rendered page,
-  from those documents, the url rewrite documents and the category documents, under the
-  ProductFrontend mode. `registration.php` registers the module only where Snowdog_Menu's code is
-  installed.
+  triggers on the menu, store and node tables, and through `Model/Mview/MenuLookupSubscription` on
+  the tables whose rows name no menu, the node customer groups and the CMS pages and blocks with
+  their store rows): a document per active menu in each store view it is assigned to, directly or
+  through store 0, with the CMS rows its CMS nodes name and a marker per store view, and the
+  categories feed field `menuProductCount` (the rows of the category in the category product index
+  of the store view) / the menu, its nodes and the data of every node type of a rendered page, from
+  those documents, the url rewrite documents, the category documents and the product documents,
+  under the ProductFrontend mode, so a menu renders without SQL. A product node's price is the price
+  its listing card advertises, not the price index's minimal price core's Snowdog reads.
+  `registration.php` registers the module only where Snowdog_Menu's code is installed.
 - `CatalogStorefrontElasticsuite`: the `elasticsuite` engine registered with
   core's client resolver on core's own client factory, with
   `Model/Client/Options` answering from `smile_elasticsuite_core_base_settings/
