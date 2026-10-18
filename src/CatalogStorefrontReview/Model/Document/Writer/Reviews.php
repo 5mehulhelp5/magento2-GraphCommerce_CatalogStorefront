@@ -5,6 +5,7 @@ namespace GraphCommerce\CatalogStorefrontReview\Model\Document\Writer;
 
 use GraphCommerce\CatalogStorefront\Model\Document\Scopes;
 use GraphCommerce\CatalogStorefrontApi\Document\FeedWriterInterface;
+use GraphCommerce\CatalogStorefrontApi\Document\RebuildSeederInterface;
 use GraphCommerce\CatalogStorefrontApi\Storage\MetadataDocumentStorageInterface;
 use GraphCommerce\CatalogStorefrontReview\Model\Document\RatingId;
 
@@ -14,10 +15,22 @@ use GraphCommerce\CatalogStorefrontReview\Model\Document\RatingId;
  * per rating, and removes it where it is not or once it is deleted. The
  * product document carries nothing about reviews: the summary and the review
  * page are queries over the review documents.
+ *
+ * Every batch also writes the marker document of every store view, id 0 under
+ * the product id "0", which no product has: a store view that holds it has its
+ * review documents, so a product without one has no visible reviews. A read
+ * by product id, or a summary of product ids, never meets it. A rebuild seeds
+ * the marker too, so a store without reviews, which no batch writes, has it.
  */
-class Reviews implements FeedWriterInterface
+class Reviews implements FeedWriterInterface, RebuildSeederInterface
 {
     public const ENTITY = 'review';
+
+    public const MARKER = 0;
+
+    public const MARKER_PRODUCT = '0';
+
+    private const MARKER_DOCUMENT = ['productId' => self::MARKER_PRODUCT, 'percents' => []];
 
     public function __construct(
         private readonly MetadataDocumentStorageInterface $reviews,
@@ -63,8 +76,13 @@ class Reviews implements FeedWriterInterface
             }
         }
         foreach ($stores as $store) {
-            $this->reviews->upsert(self::ENTITY, $store, $upserts[$store] ?? []);
+            $this->reviews->upsert(self::ENTITY, $store, [self::MARKER => self::MARKER_DOCUMENT] + ($upserts[$store] ?? []));
             $this->reviews->delete(self::ENTITY, $store, $deletes[$store] ?? []);
         }
+    }
+
+    public function seed(string $storeViewCode): void
+    {
+        $this->reviews->upsert(self::ENTITY, $storeViewCode, [self::MARKER => self::MARKER_DOCUMENT]);
     }
 }

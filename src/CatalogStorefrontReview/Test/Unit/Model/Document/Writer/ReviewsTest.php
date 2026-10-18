@@ -36,7 +36,7 @@ class ReviewsTest extends TestCase
             ['reviewId' => 2, 'productId' => 7, 'visibility' => ['second'], 'ratings' => []],
         ]);
 
-        self::assertSame(['review', 'default', [1 => [
+        self::assertSame(['review', 'default', [0 => ['productId' => '0', 'percents' => []], 1 => [
             'reviewId' => 1,
             'productId' => '7',
             'title' => 'Good',
@@ -46,8 +46,24 @@ class ReviewsTest extends TestCase
             'votes' => [4 => 2],
             'percents' => [40.0],
         ]]], $upserts->calls[0]);
-        self::assertSame([2], array_keys($upserts->calls[1][2]));
+        self::assertSame([0, 2], array_keys($upserts->calls[1][2]));
         self::assertSame([['review', 'default', [2]], ['review', 'second', [1]]], $deletes->calls);
+    }
+
+    public function testEveryBatchWritesTheMarkerOfEveryStoreView(): void
+    {
+        // A batch of deletes only still says the store view has its review documents.
+        [$storage, $upserts] = $this->storage();
+
+        $this->writer($storage)->write([['reviewId' => 3, 'productId' => 7, 'deleted' => true, 'visibility' => []]]);
+
+        self::assertSame(
+            [
+                ['review', 'default', [0 => ['productId' => '0', 'percents' => []]]],
+                ['review', 'second', [0 => ['productId' => '0', 'percents' => []]]],
+            ],
+            $upserts->calls
+        );
     }
 
     public function testAVoteOfARatingTheRowHasNoScaleForCountsAsNoPercent(): void
@@ -62,7 +78,18 @@ class ReviewsTest extends TestCase
         ]]);
 
         self::assertSame([], $upserts->calls[0][2][1]['percents']);
+        self::assertArrayHasKey(0, $upserts->calls[0][2], 'the marker');
         self::assertSame([4 => 2], $upserts->calls[0][2][1]['votes']);
+    }
+
+    public function testTheSeedWritesTheMarkerOfAStoreView(): void
+    {
+        // A store without reviews exports no row, so only the rebuild's seed writes its marker.
+        [$storage, $upserts] = $this->storage();
+
+        $this->writer($storage)->seed('default');
+
+        self::assertSame([['review', 'default', [0 => ['productId' => '0', 'percents' => []]]]], $upserts->calls);
     }
 
     private function writer(MetadataDocumentStorageInterface $storage): Reviews

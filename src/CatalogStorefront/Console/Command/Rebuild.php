@@ -5,6 +5,7 @@ namespace GraphCommerce\CatalogStorefront\Console\Command;
 
 use GraphCommerce\CatalogStorefront\Model\Document\Scopes;
 use GraphCommerce\CatalogStorefront\Model\Feeds;
+use GraphCommerce\CatalogStorefrontApi\Document\RebuildSeederInterface;
 use GraphCommerce\CatalogStorefrontApi\Storage\MetadataDocumentStorageInterface;
 use GraphCommerce\CatalogStorefrontApi\Storage\ProductDocumentStorageInterface;
 use Magento\Backend\App\Area\FrontNameResolver;
@@ -33,7 +34,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * rebuild that fails leaves the reads where
  * they were; the next rebuild replaces the staged index, or `--promote`
  * promotes what the feeds filled since, when the export finished by another
- * road (a reindex that pulled the feeds along as dependencies).
+ * road (a reindex that pulled the feeds along as dependencies). Before an
+ * entity's indices are promoted, its seeders (di.xml `seeders`) write what
+ * the documents must hold even where the feeds exported no row.
  */
 class Rebuild extends Command
 {
@@ -51,6 +54,8 @@ class Rebuild extends Command
         private readonly Feeds $feeds,
         private readonly Scopes $scopes,
         private readonly array $scopeFeeds = [],
+        /** @var array<string, RebuildSeederInterface[]> by entity */
+        private readonly array $seeders = [],
     ) {
         parent::__construct();
     }
@@ -144,6 +149,9 @@ class Rebuild extends Command
     {
         foreach ($entities as $entity) {
             foreach ($this->storeManager->getStores() as $store) {
+                foreach ($this->seeders[$entity] ?? [] as $seeder) {
+                    $seeder->seed($store->getCode());
+                }
                 $entity === self::PRODUCT
                     ? $this->products->promote($store->getCode())
                     : $this->metadata->promote($entity, $store->getCode());

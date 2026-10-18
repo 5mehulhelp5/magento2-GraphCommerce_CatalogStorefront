@@ -3,6 +3,9 @@
     <module name="GraphCommerce_CatalogStorefrontReviewFrontend">
         <sequence>
             <module name="Magento_Review"/>
+            <module name="GraphCommerce_CatalogStorefrontApi"/>
+            <module name="GraphCommerce_CatalogStorefront"/>
+            <module name="GraphCommerce_CatalogStorefrontReview"/>
         </sequence>
     </module>
 </config>

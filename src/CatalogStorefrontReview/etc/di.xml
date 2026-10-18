@@ -92,4 +92,14 @@
             </argument>
         </arguments>
     </type>
+    <!-- A store without reviews exports no review row, so the rebuild writes the marker of every store view. -->
+    <type name="GraphCommerce\CatalogStorefront\Console\Command\Rebuild">
+        <arguments>
+            <argument name="seeders" xsi:type="array">
+                <item name="review" xsi:type="array">
+                    <item name="marker" xsi:type="object">GraphCommerce\CatalogStorefrontReview\Model\Document\Writer\Reviews</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
