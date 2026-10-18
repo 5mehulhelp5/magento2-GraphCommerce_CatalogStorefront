@@ -19,7 +19,8 @@ passes.
   `Storage\ProductDocumentStorageInterface` and
   `Storage\MetadataDocumentStorageInterface` (the document stores, entity name
   per call for the metadata feeds), `Document\FeedWriterInterface` (writes one
-  feed's rows), `Read\ProductDocumentsInterface` (documents
+  feed's rows), `Document\RebuildSeederInterface` (what a rebuild writes into an
+  entity's staged index before it promotes it), `Read\ProductDocumentsInterface` (documents
   and models by id, DOCUMENT_KEY, the lazy composite price data),
   `Read\DocumentContext` (store, group key, composite price data) and
   `Read\PriceRangeInterface` (the range of one product type), and
@@ -234,12 +235,15 @@ passes.
   range / the deprecated price rewrite, the grouped items resolver.
 - `CatalogStorefrontDownloadable` / `...DownloadableGraphQl`: the downloadable
   range registration / the links and samples resolvers.
-- `CatalogStorefrontReview` / `...ReviewGraphQl`: the reviews and rating feeds
-  made to export like the modern ones, the review date field, their writers
-  (reviews become documents of their own, declared to the store through
-  `EntityMappings`), the rating documents reader, the feed table schema / the
-  reviews prefiller (one aggregation per page), the reviews resolver (a query
-  per page).
+- `CatalogStorefrontReview` / `...ReviewGraphQl` / `...ReviewFrontend`: the reviews and
+  rating feeds made to export like the modern ones, the review date field, the rating
+  position and entity, their writers (reviews become documents of their own, declared to the
+  store through `EntityMappings`, with a marker document per store view, id 0 under product
+  id `0`), the rating documents reader, the feed table schema / the reviews prefiller (one
+  aggregation per page), the reviews resolver (a query per page) / core's rendered review
+  blocks of a product that carries a document: the review list and its pager from one
+  search, the form's ratings, the summary (`Model/ReviewSummaries`, one aggregation that
+  also finds the marker).
 - `CatalogStorefrontProductFrontend`: rendered category and search listing
   pages from documents, for a Luma or Hyvä theme, off by default
   (`Model/Mode`: the store view's Serve Product Listings setting, or the
@@ -665,8 +669,11 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   promotes them (a database copy carries feed tables that say every website
   went out to a document store that never had it), then it stages a fresh
   index per store view, truncates the feed tables
-  registered for it (di.xml `feeds` on `Model/Feeds`), runs their indexers
-  and promotes the fresh indices; the reads keep the old documents until then;
+  registered for it (di.xml `feeds` on `Model/Feeds`), runs their indexers,
+  lets the entity's seeders (di.xml `seeders` on the command,
+  `CatalogStorefrontApi\Document\RebuildSeederInterface`) write what its documents
+  hold even where the feeds export no row, such as the review marker of a store
+  without reviews, and promotes the fresh indices; the reads keep the old documents until then;
   about ten seconds for the demo catalog. By hand: stage or drop the index, truncate `cde_products_feed`,
   `cde_product_prices_feed`, `cde_product_variants_feed`,
   `inventory_data_exporter_stock_status_feed` and

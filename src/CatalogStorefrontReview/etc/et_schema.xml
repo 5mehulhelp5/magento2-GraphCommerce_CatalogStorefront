@@ -18,6 +18,11 @@
         <field name="ratingId" type="Int"/>
         <field name="scale" type="Int"/>
     </record>
+    <!-- The review form lists the ratings of its entity by position; Processor\Ratings fills both. -->
+    <record name="RatingMetadata">
+        <field name="position" type="Int"/>
+        <field name="entityCode" type="String"/>
+    </record>
     <record name="ProductReviewSummary" skipNull="true">
         <field name="storeViewCode" type="String"/>
         <field name="state" type="String"/>

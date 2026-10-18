@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <!-- The form template asks for the ratings seven times, and the block loads them every time. -->
+    <!--
+        The form template asks for the ratings seven times, and the block loads them every time. The
+        memo is outside, so the ratings of a product served from a document are built once as well.
+    -->
     <type name="Magento\Review\Block\Form">
         <plugin name="graphcommerce_catalog_storefront_review_ratings_memo"
-                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\RatingsMemo"/>
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\RatingsMemo" sortOrder="10"/>
+        <plugin name="graphcommerce_catalog_storefront_review_ratings_from_documents"
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\Detail\RatingsFromDocuments" sortOrder="20"/>
+    </type>
+    <!-- The block knows the product, so it marks the collection the seams below fill. -->
+    <type name="Magento\Review\Block\Product\View">
+        <plugin name="graphcommerce_catalog_storefront_review_collection_flag"
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\Detail\ReviewCollectionFlag"/>
+    </type>
+    <!-- A marked collection only: the review page's own collection and the admin's stay on core. -->
+    <type name="Magento\Review\Model\ResourceModel\Review\Collection">
+        <plugin name="graphcommerce_catalog_storefront_reviews_from_documents"
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\Detail\ReviewsFromDocuments"/>
+        <plugin name="graphcommerce_catalog_storefront_review_count_from_documents"
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\Detail\ReviewCountFromDocuments"/>
+        <plugin name="graphcommerce_catalog_storefront_rate_votes_from_documents"
+                type="GraphCommerce\CatalogStorefrontReviewFrontend\Plugin\Detail\RateVotesFromDocuments"/>
     </type>
 </config>
