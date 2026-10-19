@@ -224,7 +224,12 @@ passes.
   management service says which types own a quantity; `stock_sources` from the
   slice's `sources`).
 - `CatalogStorefrontConfigurableProduct` / `...ConfigurableProductGraphQl`: the
-  variants writer, the option value details patch-up, the configurable range /
+  variants writer, the option value details patch-up, the configurable range,
+  `Plugin/Eav/ResyncConfigurablesOnAttributeChange` (an attribute save that changes the
+  attribute's labels or its options' swatches schedules the products feed for the
+  configurables that copy them, beside core's option label resync; the products feed's
+  `configurableProductsByChildren` resolver adds a child's configurables to a sync, so core's
+  resync of the children already covers option labels) /
   the configurable options document field (a GraphQL shape stored at index
   time), the variants, options and options selection resolvers (`followFilters` selects from
   GraphQL Catalog's `ActiveFilters` over the variant documents, sort order 10 before the core

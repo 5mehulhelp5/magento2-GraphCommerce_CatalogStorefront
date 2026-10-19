@@ -6,9 +6,13 @@
     "require": {
         "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
         "magento/framework": "*",
+        "magento/module-catalog-data-exporter": "*",
         "magento/module-configurable-product": "*",
         "magento/module-configurable-product-data-exporter": "*",
+        "magento/module-data-exporter": "*",
+        "magento/module-eav": "*",
         "magento/module-product-variant-data-exporter": "*",
+        "magento/module-swatches": "*",
         "graphcommerce/module-catalog-storefront": "self.version",
         "graphcommerce/module-catalog-storefront-price": "self.version"
     },
