@@ -216,13 +216,19 @@ passes.
   tax address of a signed-in customer and its tax rates) and the
   queries under `subjects` (cart, wish list, order: their own entity on both
   paths) are printed and fail no query.
-- `CatalogStorefrontInventory` / `...InventoryGraphQl`: the stock feed writer
+- `CatalogStorefrontInventory` / `...InventoryGraphQl` / `...InventoryFrontend`: the stock feed writer
   (a stock's rows land on the store views of the websites it sells through)
   and stock item feed fields, the source items of the stock per row
   (`Provider/StockSources`: enabled sources in priority order with the physical
-  quantity and the location) / the stock prefiller (the MSI source item
-  management service says which types own a quantity; `stock_sources` from the
-  slice's `sources`).
+  quantity and the location), `Plugin/DataExporter/QueueStockOfExportedProducts` (each products
+  feed run schedules its products' stock rows, since only the products feed watches
+  `cataloginventory_stock_item`, where the stock item settings change; a stock feed trigger on that
+  shared table would get the plain statement of whichever view subscribes last) / the stock
+  prefiller (the MSI source item management service says which types own a quantity;
+  `stock_sources` from the slice's `sources`) / `Plugin/StockItemFromDocument` (the stock registry's
+  stock item of the product page's product from its slice, core's model with the use-config flags
+  where the slice has null; bundle and grouped, which have no stock row, stay core's). A separate
+  frontend module, so ProductFrontend does not require MSI.
 - `CatalogStorefrontConfigurableProduct` / `...ConfigurableProductGraphQl`: the
   variants writer, the option value details patch-up, the configurable range,
   `Plugin/Eav/ResyncConfigurablesOnAttributeChange` (an attribute save that changes the
