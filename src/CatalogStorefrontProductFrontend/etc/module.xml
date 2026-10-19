@@ -4,6 +4,7 @@
         <sequence>
             <module name="GraphCommerce_CatalogStorefront"/>
             <module name="GraphCommerce_CatalogStorefrontPrice"/>
+            <module name="GraphCommerce_CatalogStorefrontSwatches"/>
             <module name="Magento_Catalog"/>
             <module name="Magento_CatalogRule"/>
             <module name="Magento_CatalogSearch"/>

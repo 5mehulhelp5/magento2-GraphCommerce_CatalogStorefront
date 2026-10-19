@@ -280,7 +280,10 @@ passes.
   `Plugin/StoreLabelFromDocuments` answers `getStoreLabel()` of a product
   attribute from its document (core keeps the store labels it read on the
   attribute for the life of the worker, so a changed label otherwise shows only
-  after a restart); `Plugin/Detail/ProductDocument` reads the documents of every
+  after a restart); `Plugin/SwatchesFromDocuments` answers core's swatch helper by option
+  id from the attribute documents (`AttributeDocuments::optionsById()`: the documents the
+  request read, else `all()` once; core keeps the swatches by option id alone for the
+  worker's life, across store views); `Plugin/Detail/ProductDocument` reads the documents of every
   attribute of the product page's attribute set in one request once it builds
   the product, and `Plugin/Listing/FilterableAttributesFromDocuments` reads every
   attribute document of the store view once per listing request

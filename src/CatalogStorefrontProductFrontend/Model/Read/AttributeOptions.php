@@ -37,24 +37,36 @@ class AttributeOptions
     }
 
     /**
+     * The store view of the request when it serves its listings or its product pages from documents,
+     * outside an emulated area.
+     */
+    public function requestStore(): ?StoreInterface
+    {
+        if ($this->appState->isAreaCodeEmulated()) {
+            return null;
+        }
+        $store = $this->storeManager->getStore();
+        $storeId = (int)$store->getId();
+
+        return $this->mode->listing($storeId) || $this->mode->detail($storeId) ? $store : null;
+    }
+
+    /**
      * The store view of the request when the attribute's document serves it.
      *
      * @param AbstractAttribute $attribute its store, null for the request's
      */
     public function served(AbstractAttribute $attribute): ?StoreInterface
     {
-        if ($this->appState->isAreaCodeEmulated()
+        $store = $this->requestStore();
+        if ($store === null
             || $attribute->getEntityType()->getEntityTypeCode() !== Product::ENTITY
+            || ($attribute->getStoreId() !== null && (int)$attribute->getStoreId() !== (int)$store->getId())
         ) {
             return null;
         }
-        $store = $this->storeManager->getStore();
-        $storeId = (int)$store->getId();
-        if ($attribute->getStoreId() !== null && (int)$attribute->getStoreId() !== $storeId) {
-            return null;
-        }
 
-        return $this->mode->listing($storeId) || $this->mode->detail($storeId) ? $store : null;
+        return $store;
     }
 
     /**

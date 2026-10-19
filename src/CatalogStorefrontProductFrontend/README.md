@@ -38,6 +38,14 @@ under Catalog > Catalog > Catalog Storefront Document Store:
   navigation. Core keeps the store labels it read on the attribute for the life of the process,
   so under an application server a changed label shows only after a restart; the document follows
   the change through the attributes feed. A document without a label stops the page.
+- [`Plugin/SwatchesFromDocuments`](Plugin/SwatchesFromDocuments.php) answers core's swatch
+  helper (`getSwatchesByOptionsId()`) from the attribute documents: the swatches of a product
+  page, of the cards of a listing and of its layered navigation. Core keeps the swatches it read
+  by option id alone for the life of the process, so a changed swatch otherwise shows only after a
+  restart, and a text swatch read for one store view answers the others. The helper knows the
+  option ids only; `AttributeDocuments::optionsById()` finds them in the documents the request
+  read, else in every document of the store view, read once. The swatches are on the documents
+  through GraphCommerce_CatalogStorefrontSwatches, which this module requires.
 - [`Plugin/Listing/TaxPriceFromRate`](Plugin/Listing/TaxPriceFromRate.php) prices a document
   product's amount with the rate of the request through the price module's `TaxPrice`, the
   arithmetic of the GraphQL path, instead of core's tax calculator per amount.

@@ -14,4 +14,8 @@
     <type name="Magento\Eav\Model\Entity\Attribute">
         <plugin name="catalog_storefront_frontend_store_label" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\StoreLabelFromDocuments" sortOrder="10"/>
     </type>
+    <!-- The swatches a page shows: the product page, the cards of a listing and its layered navigation. -->
+    <type name="Magento\Swatches\Helper\Data">
+        <plugin name="catalog_storefront_frontend_swatches" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\SwatchesFromDocuments" sortOrder="10"/>
+    </type>
 </config>
