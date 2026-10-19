@@ -19,6 +19,19 @@ under Catalog > Catalog > Catalog Storefront Document Store:
 - [`Plugin/Listing/FilterableAttributesFromDocuments`](Plugin/Listing/FilterableAttributesFromDocuments.php)
   lists the filterable attributes of the layered navigation from the attribute documents, with
   the attribute models of the EAV config.
+- [`Plugin/OptionsFromDocuments`](Plugin/OptionsFromDocuments.php) answers `getAllOptions()` and
+  `getSpecificOptions()`, and so `getOptionText()`, of a product attribute's table source from
+  its attribute document ([`Model/Read/AttributeOptions`](Model/Read/AttributeOptions.php)): the
+  labels of the attributes of a product page, of its secondary info and of the swatches, which
+  core reads for every value. An attribute with a source model of its own and a read under an
+  emulated area, as the attribute export makes, read the tables; an attribute without a document
+  and a read of the admin labels stop the page.
+  [`Plugin/Detail/ProductDocument`](Plugin/Detail/ProductDocument.php), once it builds the
+  product page's product, reads the documents of every attribute of its attribute set whose
+  frontend asks the source (select, multiselect, boolean) in one request
+  (`AttributeOptions::prime()`): the secondary info, the attributes table and the swatches then
+  read none. The read carries every option of those attributes, so an attribute with very many
+  options makes it large.
 - [`Plugin/Listing/TaxPriceFromRate`](Plugin/Listing/TaxPriceFromRate.php) prices a document
   product's amount with the rate of the request through the price module's `TaxPrice`, the
   arithmetic of the GraphQL path, instead of core's tax calculator per amount.

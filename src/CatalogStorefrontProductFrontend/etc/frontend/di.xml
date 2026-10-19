@@ -6,4 +6,8 @@
     <type name="Magento\CatalogRule\Observer\ProcessFrontFinalPriceObserver">
         <plugin name="catalog_storefront_frontend_catalog_rule" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Detail\CatalogRuleFromDocument"/>
     </type>
+    <!-- The option labels a page shows, the attributes of a product page, the secondary info and the swatches. -->
+    <type name="Magento\Eav\Model\Entity\Attribute\Source\Table">
+        <plugin name="catalog_storefront_frontend_options" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\OptionsFromDocuments" sortOrder="10"/>
+    </type>
 </config>
