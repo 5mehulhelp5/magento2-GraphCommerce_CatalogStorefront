@@ -27,11 +27,17 @@ class AttributeDocuments implements ResetAfterRequestInterface
     }
 
     /**
+     * Answers from every document of the store view once those are read, so a page that lists them
+     * fetches no code again.
+     *
      * @param string[] $codes
      * @return array<string, array> the documents of the codes that have one, keyed by code
      */
     public function byCodes(string $storeViewCode, array $codes): array
     {
+        if (isset($this->all[$storeViewCode])) {
+            return array_intersect_key($this->all[$storeViewCode], array_flip($codes));
+        }
         $known = $this->byStore[$storeViewCode] ?? [];
         $missing = array_values(array_diff($codes, array_keys($known)));
         if ($missing) {

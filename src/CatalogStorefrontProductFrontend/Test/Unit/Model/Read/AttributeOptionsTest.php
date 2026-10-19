@@ -46,10 +46,10 @@ class AttributeOptionsTest extends TestCase
         );
     }
 
-    private function attribute(string $code, string $input, ?string $sourceModel = null): Attribute
+    private function attribute(string $code, string $input, ?string $sourceModel = null, string $entity = 'catalog_product'): Attribute
     {
         $type = $this->createStub(Type::class);
-        $type->method('getEntityTypeCode')->willReturn('catalog_product');
+        $type->method('getEntityTypeCode')->willReturn($entity);
         $attribute = $this->createStub(Attribute::class);
         $attribute->method('getAttributeCode')->willReturn($code);
         $attribute->method('getFrontendInput')->willReturn($input);
@@ -67,11 +67,13 @@ class AttributeOptionsTest extends TestCase
         return $product;
     }
 
-    public function testTheAttributesWhoseFrontendAsksTheSourceAreReadInOneRequest(): void
+    public function testEveryAttributeOfTheProductIsReadInOneRequest(): void
     {
+        // The page asks each for its label, and a select or boolean for its options too; an
+        // attribute with a source model of its own still has its label in the document.
         $options = $this->options();
-        // A boolean without a source model of its own reads the table source too.
-        $this->documents->expects($this->once())->method('byCodes')->with('default', ['color', 'material', 'eco_collection']);
+        $this->documents->expects($this->once())->method('byCodes')
+            ->with('default', ['color', 'description', 'brand', 'material', 'eco_collection']);
 
         $options->prime($this->product([
             $this->attribute('color', 'select'),
@@ -79,6 +81,17 @@ class AttributeOptionsTest extends TestCase
             $this->attribute('brand', 'select', 'Vendor\Module\Model\Source\Brands'),
             $this->attribute('material', 'multiselect', 'Magento\Eav\Model\Entity\Attribute\Source\Table'),
             $this->attribute('eco_collection', 'boolean'),
+        ]));
+    }
+
+    public function testAnAttributeOfAnotherEntityIsNotRead(): void
+    {
+        $options = $this->options();
+        $this->documents->expects($this->once())->method('byCodes')->with('default', ['color']);
+
+        $options->prime($this->product([
+            $this->attribute('color', 'select'),
+            $this->attribute('name', 'text', null, 'catalog_category'),
         ]));
     }
 

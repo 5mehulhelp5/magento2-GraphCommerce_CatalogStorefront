@@ -10,4 +10,8 @@
     <type name="Magento\Eav\Model\Entity\Attribute\Source\Table">
         <plugin name="catalog_storefront_frontend_options" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\OptionsFromDocuments" sortOrder="10"/>
     </type>
+    <!-- The store label of every attribute a page shows: core keeps the labels it read for the life of the process. -->
+    <type name="Magento\Eav\Model\Entity\Attribute">
+        <plugin name="catalog_storefront_frontend_store_label" type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\StoreLabelFromDocuments" sortOrder="10"/>
+    </type>
 </config>

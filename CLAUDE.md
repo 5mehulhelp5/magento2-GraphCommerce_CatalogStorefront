@@ -272,9 +272,15 @@ passes.
   table source (`getAllOptions()`, `getSpecificOptions()`, and so the option
   text a page shows) from the attribute documents, skipping a read under an
   emulated area, which is how the attribute export reads the options;
-  `Plugin/Detail/ProductDocument` reads the documents of every option-bearing
+  `Plugin/StoreLabelFromDocuments` answers `getStoreLabel()` of a product
+  attribute from its document (core keeps the store labels it read on the
+  attribute for the life of the worker, so a changed label otherwise shows only
+  after a restart); `Plugin/Detail/ProductDocument` reads the documents of every
   attribute of the product page's attribute set in one request once it builds
-  the product.
+  the product, and `Plugin/Listing/FilterableAttributesFromDocuments` reads every
+  attribute document of the store view once per listing request
+  (`AttributeDocuments::all()`, which `byCodes()` then answers from), so the
+  sort order and card swatch labels read nothing further.
 - `CatalogStorefrontConfigurableProductFrontend`: a configurable on a rendered
   page. Every seam acts on a product that carries a document, so it serves a
   listing card and a product detail page alike.
@@ -635,7 +641,7 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   attribute documents for custom_attributesV2, the rating scale for the
   review percents; the facet labels come from one `any()` query on the attribute
   index by option id, filterable mode and code through
-  `Plugin/Layer/AttributeOptionsFromDocuments` (GraphQl), so a listing never loads
+  `Plugin/Layer/AttributeOptionsFromDocuments` (GraphQl), so a GraphQL listing never loads
   every attribute), `CatalogStorefrontSearch/Plugin/FieldNameMemo` (search index field name
   per attribute code and context, the core mapper asks several times per
   attribute), `Model/Mode` and `Model/Strict` are request-scoped. Derivations

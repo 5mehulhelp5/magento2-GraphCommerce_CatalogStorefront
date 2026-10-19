@@ -17,8 +17,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Builds the product selected by catalog_product_view from its document.
- * The model carries its status, visibility, categories, type and store. The options of its
- * attributes, which the page asks for attribute after attribute, are read with it in one request.
+ * The model carries its status, visibility, categories, type and store. The labels and options of
+ * its attributes, which the page asks for attribute after attribute, are read with it in one request.
  */
 class ProductDocument implements ResetAfterRequestInterface
 {
