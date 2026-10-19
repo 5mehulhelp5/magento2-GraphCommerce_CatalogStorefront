@@ -3,14 +3,7 @@ declare(strict_types=1);
 
 namespace GraphCommerce\CatalogStorefrontSnowdogMenu\Model\Mview;
 
-use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\DB\Ddl\Trigger;
-use Magento\Framework\DB\Ddl\TriggerFactory;
-use Magento\Framework\Mview\Config;
-use Magento\Framework\Mview\View\CollectionInterface;
-use Magento\Framework\Mview\View\Subscription;
-use Magento\Framework\Mview\View\SubscriptionStatementPostprocessorInterface;
-use Magento\Framework\Mview\ViewInterface;
+use GraphCommerce\CatalogStorefront\Model\Mview\LookupSubscription;
 
 /**
  * Marks the menus of a row that names no menu: the menu of a node whose customer groups change, and
@@ -24,7 +17,7 @@ use Magento\Framework\Mview\ViewInterface;
  * changed identifier or store marks the menus of both. A view linked to the same table keeps the
  * statement of the base class.
  */
-class MenuLookupSubscription extends Subscription
+class MenuLookupSubscription extends LookupSubscription
 {
     /**
      * Per table, the select of the menu ids up to the expression the row's value is compared with,
@@ -56,77 +49,13 @@ class MenuLookupSubscription extends Subscription
     ];
 
     /**
-     * @param ResourceConnection $resource
-     * @param TriggerFactory $triggerFactory
-     * @param CollectionInterface $viewCollection
-     * @param ViewInterface $view
      * @param string $tableName
-     * @param string $columnName
-     * @param SubscriptionStatementPostprocessorInterface $postprocessor
-     * @param array $ignoredUpdateColumns
-     * @param array $ignoredUpdateColumnsBySubscription
-     * @param Config|null $mviewConfig
-     */
-    public function __construct(
-        ResourceConnection $resource,
-        TriggerFactory $triggerFactory,
-        CollectionInterface $viewCollection,
-        ViewInterface $view,
-        $tableName,
-        $columnName,
-        private readonly SubscriptionStatementPostprocessorInterface $postprocessor,
-        $ignoredUpdateColumns = [],
-        $ignoredUpdateColumnsBySubscription = [],
-        ?Config $mviewConfig = null,
-    ) {
-        parent::__construct(
-            $resource,
-            $triggerFactory,
-            $viewCollection,
-            $view,
-            $tableName,
-            $columnName,
-            $ignoredUpdateColumns,
-            $ignoredUpdateColumnsBySubscription,
-            $mviewConfig,
-            $postprocessor
-        );
-    }
-
-    /**
-     * @param string $event
-     * @param ViewInterface $view
-     * @return string
+     * @return string[]
      * @throws \LogicException when the table has no menu lookup
      */
-    protected function buildStatement(string $event, ViewInterface $view): string
+    protected function lookup(string $tableName): array
     {
-        if ($view->getId() !== $this->getView()->getId()) {
-            return parent::buildStatement($event, $view);
-        }
-        $lookup = self::LOOKUPS[$this->getTableName()] ?? null;
-        if ($lookup === null) {
-            throw new \LogicException(sprintf('The table %s has no menu lookup', $this->getTableName()));
-        }
-        $changelog = $view->getChangelog();
-        $select = preg_replace_callback(
-            '/\{(\w+)\}/',
-            fn(array $table): string => $this->connection->quoteIdentifier($this->resource->getTableName($table[1])),
-            $lookup[0]
-        );
-        $column = $this->connection->quoteIdentifier($lookup[1]);
-        $statement = sprintf(
-            'INSERT INTO %s (%s) %s %s;',
-            $this->connection->quoteIdentifier($this->resource->getTableName($changelog->getName())),
-            $this->connection->quoteIdentifier($changelog->getColumnName()),
-            $select,
-            match ($event) {
-                Trigger::EVENT_INSERT => '= NEW.' . $column,
-                Trigger::EVENT_DELETE => '= OLD.' . $column,
-                default => sprintf('IN (NEW.%1$s, OLD.%1$s)', $column),
-            }
-        );
-
-        return $this->postprocessor->process($this->getTableName(), $event, $statement);
+        return self::LOOKUPS[$tableName]
+            ?? throw new \LogicException(sprintf('The table %s has no menu lookup', $tableName));
     }
 }

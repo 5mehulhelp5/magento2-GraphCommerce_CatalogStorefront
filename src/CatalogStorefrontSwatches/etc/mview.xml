@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <!-- A swatch names its option, not its attribute: the attributes feed exports the attribute the
+         subscription looks up for it again. -->
+    <view id="cde_product_attributes_feed" class="Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndex" group="indexer">
+        <subscriptions>
+            <table name="eav_attribute_option_swatch" entity_column="option_id"
+                   subscription_model="GraphCommerce\CatalogStorefront\Model\Mview\AttributeOptionSubscription"/>
+        </subscriptions>
+    </view>
+</config>
