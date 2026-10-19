@@ -30,7 +30,7 @@
     -->
     <type name="Magento\Catalog\Api\ProductRepositoryInterface">
         <plugin name="graphcommerce_catalog_storefront_product_detail_document"
-                type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Detail\ProductDocument"/>
+                type="GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Detail\ProductDocument" sortOrder="10"/>
     </type>
 
     <!-- The price box of a document product renders without the block cache. -->

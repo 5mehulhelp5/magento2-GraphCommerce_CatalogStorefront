@@ -32,4 +32,47 @@ class AttributeDocumentsTest extends TestCase
         self::assertFalse($documents->available('default'));
         self::assertFalse($documents->available('default'));
     }
+
+    public function testCodesAreAnsweredFromEveryDocumentOnceThoseAreRead(): void
+    {
+        // A listing page reads them all for its layer; the labels of the page then fetch nothing.
+        $storage = $this->createMock(MetadataDocumentStorageInterface::class);
+        $storage->expects(self::once())->method('all')->with('attribute', 'default')
+            ->willReturn(['color' => ['label' => 'Color'], 'size' => ['label' => 'Size']]);
+        $storage->expects(self::never())->method('get');
+        $documents = new AttributeDocuments($storage);
+
+        $documents->all('default');
+
+        self::assertSame(['size' => ['label' => 'Size']], $documents->byCodes('default', ['size', 'gone']));
+    }
+
+    public function testOptionsAreFoundInTheDocumentsTheRequestReadWithoutAFurtherRead(): void
+    {
+        // A product page reads the documents of its attribute set; its swatches belong to them.
+        $storage = $this->createMock(MetadataDocumentStorageInterface::class);
+        $storage->method('get')->willReturn(['color' => ['options' => [['id' => '49', 'swatch' => ['type' => 1, 'value' => '#000000']], ['id' => '50']]]]);
+        $storage->expects(self::never())->method('all');
+        $documents = new AttributeDocuments($storage);
+        $documents->byCodes('default', ['color']);
+
+        self::assertSame(
+            ['49' => ['id' => '49', 'swatch' => ['type' => 1, 'value' => '#000000']], '50' => ['id' => '50']],
+            $documents->optionsById('default', [49, '50'])
+        );
+    }
+
+    public function testAnOptionNotAmongTheReadDocumentsReadsEveryDocumentOnce(): void
+    {
+        // The caller knows only the option id, not the attribute; an id no document holds stays absent.
+        $storage = $this->createMock(MetadataDocumentStorageInterface::class);
+        $storage->expects(self::once())->method('all')->willReturn([
+            'color' => ['options' => [['id' => '49']]],
+            'size' => ['options' => [['id' => '166']]],
+        ]);
+        $documents = new AttributeDocuments($storage);
+
+        self::assertSame(['166' => ['id' => '166']], $documents->optionsById('default', [166, 999]));
+        self::assertSame(['49' => ['id' => '49']], $documents->optionsById('default', [49]));
+    }
 }

@@ -147,7 +147,8 @@ passes.
   the rates of the product tax classes, nothing else about the customer.
 - `CatalogStorefrontSwatches` / `...SwatchesGraphQl`: the swatch of every option of a
   swatch attribute on the attribute documents (`Plugin/DataExporter/AttributeOptionSwatches`,
-  picked per store view as core's swatch helper picks it; an image swatch keeps its file) /
+  picked per store view as core's swatch helper picks it; an image swatch keeps its file; a
+  trigger on `eav_attribute_option_swatch` marks the option's attribute) /
   the document path of the `swatch` fields of GraphCommerce_GraphQlCatalogSwatches: the
   GraphQl module's option builders put the document swatch under `OptionSwatch::KEY`, and
   `Plugin/Layer/AggregationSwatchesFromDocuments` (sort order 10) puts it on the aggregation
@@ -223,7 +224,12 @@ passes.
   management service says which types own a quantity; `stock_sources` from the
   slice's `sources`).
 - `CatalogStorefrontConfigurableProduct` / `...ConfigurableProductGraphQl`: the
-  variants writer, the option value details patch-up, the configurable range /
+  variants writer, the option value details patch-up, the configurable range,
+  `Plugin/Eav/ResyncConfigurablesOnAttributeChange` (an attribute save that changes the
+  attribute's labels or its options' swatches schedules the products feed for the
+  configurables that copy them, beside core's option label resync; the products feed's
+  `configurableProductsByChildren` resolver adds a child's configurables to a sync, so core's
+  resync of the children already covers option labels) /
   the configurable options document field (a GraphQL shape stored at index
   time), the variants, options and options selection resolvers (`followFilters` selects from
   GraphQL Catalog's `ActiveFilters` over the variant documents, sort order 10 before the core
@@ -267,7 +273,22 @@ passes.
   A theme that caches its rendered cards (Hyvä does, for an hour) pays off on
   misses only: measure warm and cold apart. The module names no theme class;
   a theme's own classes, templates or config would go to a module with the
-  theme as suffix.
+  theme as suffix. `Plugin/OptionsFromDocuments` answers a product attribute's
+  table source (`getAllOptions()`, `getSpecificOptions()`, and so the option
+  text a page shows) from the attribute documents, skipping a read under an
+  emulated area, which is how the attribute export reads the options;
+  `Plugin/StoreLabelFromDocuments` answers `getStoreLabel()` of a product
+  attribute from its document (core keeps the store labels it read on the
+  attribute for the life of the worker, so a changed label otherwise shows only
+  after a restart); `Plugin/SwatchesFromDocuments` answers core's swatch helper by option
+  id from the attribute documents (`AttributeDocuments::optionsById()`: the documents the
+  request read, else `all()` once; core keeps the swatches by option id alone for the
+  worker's life, across store views); `Plugin/Detail/ProductDocument` reads the documents of every
+  attribute of the product page's attribute set in one request once it builds
+  the product, and `Plugin/Listing/FilterableAttributesFromDocuments` reads every
+  attribute document of the store view once per listing request
+  (`AttributeDocuments::all()`, which `byCodes()` then answers from), so the
+  sort order and card swatch labels read nothing further.
 - `CatalogStorefrontConfigurableProductFrontend`: a configurable on a rendered
   page. Every seam acts on a product that carries a document, so it serves a
   listing card and a product detail page alike.
@@ -487,7 +508,10 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   the feed sets them false below an inactive or hidden ancestor). The product attributes feed lands the same way, keyed by attribute
   code and extended with the options in store view labels, the layer position
   and the filterable mode (`Model/DataExporter/Provider/AttributeOptions`,
-  `AttributeLayer`); the rating metadata feed lands keyed by rating id,
+  `AttributeLayer`; `etc/mview.xml` adds the triggers core's view lacks, on
+  `eav_attribute_label`, `eav_attribute_option` and, through
+  `Model/Mview/AttributeOptionSubscription` on the base `Model/Mview/LookupSubscription`,
+  `eav_attribute_option_value`, whose rows mark their option's attribute); the rating metadata feed lands keyed by rating id,
   exported during indexing like the reviews (`Model/DataExporter/Processor/Ratings`,
   `etc/db_schema.xml` adds the modern columns to its table, di.xml gives its
   indexer the generic serializer). The reviews slice keeps each review's votes
@@ -625,7 +649,7 @@ image URLs come from the feed row (`Model/DataExporter/Provider/ImageUrls`).
   attribute documents for custom_attributesV2, the rating scale for the
   review percents; the facet labels come from one `any()` query on the attribute
   index by option id, filterable mode and code through
-  `Plugin/Layer/AttributeOptionsFromDocuments` (GraphQl), so a listing never loads
+  `Plugin/Layer/AttributeOptionsFromDocuments` (GraphQl), so a GraphQL listing never loads
   every attribute), `CatalogStorefrontSearch/Plugin/FieldNameMemo` (search index field name
   per attribute code and context, the core mapper asks several times per
   attribute), `Model/Mode` and `Model/Strict` are request-scoped. Derivations

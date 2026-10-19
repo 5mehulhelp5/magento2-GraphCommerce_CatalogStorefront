@@ -18,7 +18,34 @@ under Catalog > Catalog > Catalog Storefront Document Store:
   come from them, so the list template runs no query.
 - [`Plugin/Listing/FilterableAttributesFromDocuments`](Plugin/Listing/FilterableAttributesFromDocuments.php)
   lists the filterable attributes of the layered navigation from the attribute documents, with
-  the attribute models of the EAV config.
+  the attribute models of the EAV config. It reads every attribute document of the store view once
+  per request, so the other labels of the page read nothing further.
+- [`Plugin/OptionsFromDocuments`](Plugin/OptionsFromDocuments.php) answers `getAllOptions()` and
+  `getSpecificOptions()`, and so `getOptionText()`, of a product attribute's table source from
+  its attribute document ([`Model/Read/AttributeOptions`](Model/Read/AttributeOptions.php)): the
+  labels of the attributes of a product page, of its secondary info and of the swatches, which
+  core reads for every value. An attribute with a source model of its own and a read under an
+  emulated area, as the attribute export makes, read the tables; an attribute without a document
+  and a read of the admin labels stop the page.
+  [`Plugin/Detail/ProductDocument`](Plugin/Detail/ProductDocument.php), once it builds the
+  product page's product, reads the documents of every attribute of its attribute set in one
+  request (`AttributeOptions::prime()`): the secondary info, the attributes table and the
+  swatches then read none. The read carries every option of those attributes, so an attribute
+  with very many options makes it large.
+- [`Plugin/StoreLabelFromDocuments`](Plugin/StoreLabelFromDocuments.php) answers
+  `getStoreLabel()` of a product attribute from its document: every attribute label a page
+  shows, the attributes table, the swatches and options, the sort order and the layered
+  navigation. Core keeps the store labels it read on the attribute for the life of the process,
+  so under an application server a changed label shows only after a restart; the document follows
+  the change through the attributes feed. A document without a label stops the page.
+- [`Plugin/SwatchesFromDocuments`](Plugin/SwatchesFromDocuments.php) answers core's swatch
+  helper (`getSwatchesByOptionsId()`) from the attribute documents: the swatches of a product
+  page, of the cards of a listing and of its layered navigation. Core keeps the swatches it read
+  by option id alone for the life of the process, so a changed swatch otherwise shows only after a
+  restart, and a text swatch read for one store view answers the others. The helper knows the
+  option ids only; `AttributeDocuments::optionsById()` finds them in the documents the request
+  read, else in every document of the store view, read once. The swatches are on the documents
+  through GraphCommerce_CatalogStorefrontSwatches, which this module requires.
 - [`Plugin/Listing/TaxPriceFromRate`](Plugin/Listing/TaxPriceFromRate.php) prices a document
   product's amount with the rate of the request through the price module's `TaxPrice`, the
   arithmetic of the GraphQL path, instead of core's tax calculator per amount.

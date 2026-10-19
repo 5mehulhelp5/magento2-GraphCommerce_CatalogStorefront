@@ -36,6 +36,10 @@
     <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
         <plugin name="graphcommerce_catalog_storefront_salable" type="GraphCommerce\CatalogStorefront\Plugin\SalableFromDocument"/>
     </type>
+    <!-- Core's resync compares option labels only; a configurable's document also copies the attribute's labels and swatches. -->
+    <type name="Magento\Eav\Model\ResourceModel\Entity\Attribute">
+        <plugin name="graphcommerce_catalog_storefront_resync_configurables" type="GraphCommerce\CatalogStorefrontConfigurableProduct\Plugin\Eav\ResyncConfigurablesOnAttributeChange" sortOrder="10"/>
+    </type>
     <type name="GraphCommerce\CatalogStorefrontPrice\Model\Read\PriceRanges">
         <arguments>
             <argument name="ranges" xsi:type="array">

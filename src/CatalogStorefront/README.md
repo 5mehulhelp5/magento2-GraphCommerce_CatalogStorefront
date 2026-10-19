@@ -14,6 +14,14 @@ The base module: feed rows in, documents out, product models for any frontend.
   the raw custom attributes, the website ids, the tax class, the image media paths, the
   link position, the category sort order and price range, the attribute options with their
   layer position, and the final price with the decimals its source is rounded to.
+- [etc/mview.xml](etc/mview.xml) subscribes the attributes feed to the attribute's store labels,
+  its options and their labels, which core's view leaves out: a save that changes only those
+  changes no row core watches. A label names its option, and
+  [`Model/Mview/AttributeOptionSubscription`](Model/Mview/AttributeOptionSubscription.php) marks
+  the option's attribute. Core's attribute save writes the labels of every option again, so every
+  Admin save of an attribute with options exports that attribute again.
+  [`Model/Mview/LookupSubscription`](Model/Mview/LookupSubscription.php) is the trigger of a table
+  whose rows name no entity of the view; a module names the lookup per table in a subclass.
 - `Model/Read/` builds product models from documents
   ([`ProductModelBuilder`](Model/Read/ProductModelBuilder.php)) and reads the attribute
   documents.

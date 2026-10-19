@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Mview/etc/mview.xsd">
+    <!-- The attribute documents carry the store labels of an attribute and the options with their
+         labels and sort order, which core's view does not subscribe: a save that changes only those
+         changes no row of eav_attribute or catalog_eav_attribute. A label names its option, not its
+         attribute, and marks the attribute the subscription looks up for it. -->
+    <view id="cde_product_attributes_feed" class="Magento\CatalogDataExporter\Model\Indexer\ProductAttributeFeedIndex" group="indexer">
+        <subscriptions>
+            <table name="eav_attribute_label" entity_column="attribute_id"/>
+            <table name="eav_attribute_option" entity_column="attribute_id"/>
+            <table name="eav_attribute_option_value" entity_column="option_id"
+                   subscription_model="GraphCommerce\CatalogStorefront\Model\Mview\AttributeOptionSubscription"/>
+        </subscriptions>
+    </view>
+</config>

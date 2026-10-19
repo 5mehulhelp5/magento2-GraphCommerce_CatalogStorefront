@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace GraphCommerce\CatalogStorefrontProductFrontend\Test\Unit\Plugin\Listing;
 
+use GraphCommerce\CatalogStorefront\Model\Read\AttributeDocuments;
 use GraphCommerce\CatalogStorefrontApi\Storage\MetadataDocumentStorageInterface;
 use GraphCommerce\CatalogStorefrontProductFrontend\Model\LoadedAttributeCollection;
 use GraphCommerce\CatalogStorefrontProductFrontend\Model\LoadedAttributeCollectionFactory;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class FilterableAttributesFromDocumentsTest extends TestCase
 {
-    /** @var array<string, string> code to store label of the listed attributes, in order */
+    /** @var string[] the codes of the listed attributes, in order */
     private array $listed = [];
 
     private int $reads = 0;
@@ -32,15 +33,11 @@ class FilterableAttributesFromDocumentsTest extends TestCase
         $this->coreAsked = false;
 
         $storage = $this->createMock(MetadataDocumentStorageInterface::class);
-        $storage->method('find')->willReturnCallback(function (string $entity, string $store, array $filter) use ($documents) {
+        $storage->method('all')->willReturnCallback(function () use ($documents) {
             $this->reads++;
-            $found = array_filter($documents, static fn (array $document) => isset($filter['filterableMode'])
-                ? in_array((int)$document['filterableMode'], $filter['filterableMode'], true)
-                : $document['filterableInSearch'] && $document['isVisible']);
 
-            return ['documents' => $found, 'total' => count($found)];
+            return $documents;
         });
-        $storage->method('count')->willReturn(count($documents));
 
         $eavConfig = $this->createMock(EavConfig::class);
         $eavConfig->method('getAttribute')->willReturnCallback(function (string $entity, string $code) use ($known) {
@@ -63,7 +60,7 @@ class FilterableAttributesFromDocumentsTest extends TestCase
         $collection = $this->createMock(LoadedAttributeCollection::class);
         $collection->method('withItems')->willReturnCallback(function (array $attributes) use ($collection) {
             foreach ($attributes as $attribute) {
-                $this->listed[$attribute->getData('attribute_code')] = $attribute->getData('store_label');
+                $this->listed[] = $attribute->getData('attribute_code');
             }
 
             return $collection;
@@ -71,7 +68,7 @@ class FilterableAttributesFromDocumentsTest extends TestCase
         $factory = $this->createMock(LoadedAttributeCollectionFactory::class);
         $factory->method('create')->willReturn($collection);
 
-        return new FilterableAttributesFromDocuments($storage, $eavConfig, $mode, $storeManager, $factory);
+        return new FilterableAttributesFromDocuments(new AttributeDocuments($storage), $eavConfig, $mode, $storeManager, $factory);
     }
 
     private function documents(): array
@@ -98,7 +95,7 @@ class FilterableAttributesFromDocumentsTest extends TestCase
 
         $plugin->aroundGetList($this->createMock(CategoryList::class), $this->proceed());
 
-        $this->assertSame(['size' => 'Maat', 'color' => 'Kleur'], $this->listed);
+        $this->assertSame(['size', 'color'], $this->listed);
         $this->assertFalse($this->coreAsked);
     }
 
@@ -108,18 +105,19 @@ class FilterableAttributesFromDocumentsTest extends TestCase
 
         $plugin->aroundGetList($this->createMock(SearchList::class), $this->proceed());
 
-        $this->assertSame(['color' => 'Kleur'], $this->listed);
+        $this->assertSame(['color'], $this->listed);
     }
 
-    public function testEachLayerReadsItsDocumentsOnce(): void
+    public function testBothLayersReadTheDocumentsOncePerRequest(): void
     {
+        // Every attribute document of the store view: the labels of the page come from the same read.
         $plugin = $this->plugin($this->documents(), ['color' => 93, 'size' => 141]);
 
         $plugin->aroundGetList($this->createMock(CategoryList::class), $this->proceed());
         $plugin->aroundGetList($this->createMock(CategoryList::class), $this->proceed());
         $plugin->aroundGetList($this->createMock(SearchList::class), $this->proceed());
 
-        $this->assertSame(2, $this->reads);
+        $this->assertSame(1, $this->reads);
     }
 
     public function testAnUnresolvedAttributeFails(): void

@@ -6,6 +6,7 @@ namespace GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Detail;
 use GraphCommerce\CatalogStorefrontApi\Read\ProductDocumentsInterface;
 use GraphCommerce\CatalogStorefront\Model\DocumentReadException;
 use GraphCommerce\CatalogStorefrontProductFrontend\Model\Mode;
+use GraphCommerce\CatalogStorefrontProductFrontend\Model\Read\AttributeOptions;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
@@ -16,7 +17,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Builds the product selected by catalog_product_view from its document.
- * The model carries its status, visibility, categories, type and store.
+ * The model carries its status, visibility, categories, type and store. The labels and options of
+ * its attributes, which the page asks for attribute after attribute, are read with it in one request.
  */
 class ProductDocument implements ResetAfterRequestInterface
 {
@@ -31,6 +33,7 @@ class ProductDocument implements ResetAfterRequestInterface
         private readonly StoreManagerInterface $storeManager,
         private readonly RequestInterface $request,
         private readonly LoggerInterface $logger,
+        private readonly AttributeOptions $attributeOptions,
         private readonly array $supportedOptionTypes = [],
     ) {
     }
@@ -113,6 +116,7 @@ class ProductDocument implements ResetAfterRequestInterface
             ));
         }
 
+        $this->attributeOptions->prime($model);
         $this->built[$key] = $model;
 
         return $model;

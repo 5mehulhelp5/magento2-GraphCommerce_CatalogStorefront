@@ -5,6 +5,7 @@ namespace GraphCommerce\CatalogStorefrontProductFrontend\Test\Unit\Plugin\Detail
 
 use GraphCommerce\CatalogStorefrontApi\Read\ProductDocumentsInterface;
 use GraphCommerce\CatalogStorefrontProductFrontend\Model\Mode;
+use GraphCommerce\CatalogStorefrontProductFrontend\Model\Read\AttributeOptions;
 use GraphCommerce\CatalogStorefrontProductFrontend\Plugin\Detail\ProductDocument;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
@@ -26,6 +27,8 @@ class ProductDocumentTest extends TestCase
 
     private ProductRepositoryInterface&MockObject $repository;
 
+    private AttributeOptions&MockObject $attributeOptions;
+
     private bool $proceeded = false;
 
     private function plugin(
@@ -37,6 +40,7 @@ class ProductDocumentTest extends TestCase
     ): ProductDocument {
         $this->products = $this->createMock(ProductDocumentsInterface::class);
         $this->repository = $this->createMock(ProductRepositoryInterface::class);
+        $this->attributeOptions = $this->createMock(AttributeOptions::class);
 
         $mode = $this->createMock(Mode::class);
         $mode->method('detail')->willReturn($serveDetail);
@@ -60,6 +64,7 @@ class ProductDocumentTest extends TestCase
             $storeManager,
             $request,
             $this->createMock(LoggerInterface::class),
+            $this->attributeOptions,
             $supportedOptionTypes,
         );
     }
@@ -105,6 +110,25 @@ class ProductDocumentTest extends TestCase
         $this->products->expects($this->once())->method('documents');
 
         $plugin->aroundGetById($this->repository, $this->proceed(), self::PRODUCT_ID);
+        $plugin->aroundGetById($this->repository, $this->proceed(), self::PRODUCT_ID);
+    }
+
+    public function testTheOptionsOfTheAttributesAreReadWithTheProductOnce(): void
+    {
+        // The page asks for the options attribute after attribute, after the product is built.
+        $plugin = $this->plugin();
+        $model = $this->serves();
+        $this->attributeOptions->expects($this->once())->method('prime')->with($model);
+
+        $plugin->aroundGetById($this->repository, $this->proceed(), self::PRODUCT_ID);
+        $plugin->aroundGetById($this->repository, $this->proceed(), self::PRODUCT_ID);
+    }
+
+    public function testAProductLoadedFromTheDatabaseReadsNoOptions(): void
+    {
+        $plugin = $this->plugin(true, 'checkout_cart_index');
+        $this->attributeOptions->expects($this->never())->method('prime');
+
         $plugin->aroundGetById($this->repository, $this->proceed(), self::PRODUCT_ID);
     }
 
