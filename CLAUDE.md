@@ -223,7 +223,10 @@ passes.
   quantity and the location), `Plugin/DataExporter/QueueStockOfExportedProducts` (each products
   feed run schedules its products' stock rows, since only the products feed watches
   `cataloginventory_stock_item`, where the stock item settings change; a stock feed trigger on that
-  shared table would get the plain statement of whichever view subscribes last) / the stock
+  shared table would get the plain statement of whichever view subscribes last; a full products sync
+  invalidates the stock feed), `Plugin/InventoryIndexer/QueueStockOfSalabilityChanges` (the skus
+  whose salability MSI's `inventory.reservations.updateSalabilityStatus` consumer changed after an
+  order, which the reservation trigger exported too early), both through `Model/StockFeedSchedule` / the stock
   prefiller (the MSI source item management service says which types own a quantity;
   `stock_sources` from the slice's `sources`) / `Plugin/StockItemFromDocument` (the stock registry's
   stock item of the product page's product from its slice, core's model with the use-config flags
