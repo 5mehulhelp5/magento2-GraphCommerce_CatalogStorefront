@@ -6,9 +6,13 @@ namespace GraphCommerce\CatalogStorefrontProductFrontend\Test\Unit\Model;
 use GraphCommerce\CatalogStorefront\Model\Config;
 use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
 use GraphCommerce\CatalogStorefrontProductFrontend\Model\Mode;
+use Magento\Framework\App\Area;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Console\Request as ConsoleRequest;
 use Magento\Framework\App\Request\Http as HttpRequest;
+use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Phrase;
 use PHPUnit\Framework\TestCase;
 
 class ModeTest extends TestCase
@@ -20,6 +24,22 @@ class ModeTest extends TestCase
 
     /** @var array<string, string> the headers the request currently carries */
     private array $headers = [];
+
+    /** The area of the current request, null for a process without one. */
+    private ?string $area = Area::AREA_FRONTEND;
+
+    private bool $emulated = false;
+
+    private function state(): State
+    {
+        $state = $this->createStub(State::class);
+        $state->method('getAreaCode')->willReturnCallback(
+            fn() => $this->area ?? throw new LocalizedException(new Phrase('Area code is not set'))
+        );
+        $state->method('isAreaCodeEmulated')->willReturnCallback(fn(): bool => $this->emulated);
+
+        return $state;
+    }
 
     /**
      * The request is built once and its headers changed per call, because that is how a worker
@@ -41,7 +61,7 @@ class ModeTest extends TestCase
         $config = $this->createMock(Config::class);
         $config->method('key')->willReturn($configuredKey);
 
-        return new Mode($scopeConfig, $config, $this->request);
+        return new Mode($scopeConfig, $config, $this->request, $this->state());
     }
 
     private function send(string $path, string $key = self::KEY): void
@@ -148,10 +168,35 @@ class ModeTest extends TestCase
         $config = $this->createMock(Config::class);
         $config->method('key')->willReturn(self::KEY);
 
-        $mode = new Mode($scopeConfig, $config, $this->createMock(ConsoleRequest::class));
+        $mode = new Mode($scopeConfig, $config, $this->createMock(ConsoleRequest::class), $this->state());
 
         $this->assertNull($mode->requested());
         $this->assertFalse($mode->listing(self::STORE_ID));
+    }
+
+    public function testOnlyARenderedStorefrontRequestIsServedFromDocuments(): void
+    {
+        // The Admin's product form loads a product's related rows through the class a page's card
+        // rows use; the exporter emulates the frontend area; a console command may have no area.
+        $mode = $this->mode(true, self::KEY, true);
+        $this->send(Mode::DOCUMENTS);
+
+        foreach ([
+            'the Admin' => [Area::AREA_ADMINHTML, false],
+            'the REST API' => [Area::AREA_WEBAPI_REST, false],
+            'cron' => [Area::AREA_CRONTAB, false],
+            'an emulated frontend' => [Area::AREA_FRONTEND, true],
+            'a process without an area' => [null, false],
+        ] as $case => [$area, $emulated]) {
+            $this->area = $area;
+            $this->emulated = $emulated;
+            $this->assertFalse($mode->listing(self::STORE_ID), $case);
+            $this->assertFalse($mode->detail(self::STORE_ID), $case);
+        }
+
+        $this->area = Area::AREA_FRONTEND;
+        $this->emulated = false;
+        $this->assertTrue($mode->listing(self::STORE_ID), 'the storefront');
     }
 
     public function testRequestedNamesThePathForThePageCache(): void

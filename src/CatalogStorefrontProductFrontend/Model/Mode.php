@@ -5,9 +5,12 @@ namespace GraphCommerce\CatalogStorefrontProductFrontend\Model;
 
 use GraphCommerce\CatalogStorefront\Model\Config;
 use GraphCommerce\CatalogStorefront\Model\StorefrontKey;
+use Magento\Framework\App\Area;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
 
 /**
@@ -16,6 +19,12 @@ use Magento\Store\Model\ScopeInterface;
  * X-Catalog-Storefront header names a path, which switches every surface at once.
  *
  * The same header the GraphQL side reads, so one request switches both.
+ *
+ * Only a rendered page of the storefront is served from documents: the frontend area, not
+ * emulated. The Admin, the APIs, cron and the console load the same collections and
+ * repositories (the product form loads a product's related rows through the class a page's
+ * card rows use), and the exporter emulates the frontend area; a plugin registered in the
+ * global scope must leave them all to core.
  */
 class Mode
 {
@@ -30,6 +39,7 @@ class Mode
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly Config $config,
         private readonly RequestInterface $request,
+        private readonly State $appState,
     ) {
     }
 
@@ -57,11 +67,28 @@ class Mode
      */
     private function fromDocuments(string $setting, int $storeId): bool
     {
+        if (!$this->storefront()) {
+            return false;
+        }
+
         return match ($this->requested()) {
             self::DOCUMENTS => true,
             self::CORE => false,
             default => $this->scopeConfig->isSetFlag($setting, ScopeInterface::SCOPE_STORE, $storeId),
         };
+    }
+
+    /**
+     * Whether this is a rendered storefront request: the frontend area, not emulated. A process
+     * without an area code (a console command before it sets one) is not.
+     */
+    private function storefront(): bool
+    {
+        try {
+            return $this->appState->getAreaCode() === Area::AREA_FRONTEND && !$this->appState->isAreaCodeEmulated();
+        } catch (LocalizedException) {
+            return false;
+        }
     }
 
     /**
