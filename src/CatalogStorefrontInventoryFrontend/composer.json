@@ -1,0 +1,23 @@
+{
+    "name": "graphcommerce/module-catalog-storefront-inventory-frontend",
+    "description": "Serves the stock of rendered catalog pages from catalog documents",
+    "type": "magento2-module",
+    "license": "MIT",
+    "require": {
+        "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
+        "magento/framework": "*",
+        "magento/module-catalog-inventory": "*",
+        "graphcommerce/module-catalog-storefront": "self.version",
+        "graphcommerce/module-catalog-storefront-api": "self.version",
+        "graphcommerce/module-catalog-storefront-inventory": "self.version",
+        "graphcommerce/module-catalog-storefront-product-frontend": "self.version"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "GraphCommerce\\CatalogStorefrontInventoryFrontend\\": ""
+        }
+    }
+}

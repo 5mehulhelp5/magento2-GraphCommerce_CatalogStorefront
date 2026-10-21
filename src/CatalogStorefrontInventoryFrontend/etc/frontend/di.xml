@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- The stock item of the product page's product: its quantity box and stock settings. -->
+    <type name="Magento\CatalogInventory\Api\StockRegistryInterface">
+        <plugin name="catalog_storefront_frontend_stock_item" type="GraphCommerce\CatalogStorefrontInventoryFrontend\Plugin\StockItemFromDocument" sortOrder="10"/>
+    </type>
+</config>

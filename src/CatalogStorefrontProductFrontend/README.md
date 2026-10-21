@@ -67,7 +67,10 @@ under Catalog > Catalog > Catalog Storefront Document Store:
   options and selections. [`GroupedProductFrontend`](../CatalogStorefrontGroupedProductFrontend)
   supplies grouped children and quantity validation. Both modules require the product and stock feeds.
 - `X-Catalog-Storefront: documents|core` under the storefront key picks the path per
-  request. [`Plugin/PageCacheOff`](Plugin/PageCacheOff.php) disables full-page
+  request. [`Model/Mode`](Model/Mode.php) answers only for the frontend area, not emulated: the
+  Admin's product form loads a product's related rows through the class a page's card rows use,
+  and the exporter emulates the frontend area, so the Admin, the APIs, cron and the console
+  stay on core whatever scope a plugin is registered in. [`Plugin/PageCacheOff`](Plugin/PageCacheOff.php) disables full-page
   caching for these requests, so each parity check renders the selected reader.
 - `catalog/storefront_documents/cache_category_pages` (on by default, per store view) set to
   0 keeps category pages out of the page cache, Varnish and built-in alike, through the same

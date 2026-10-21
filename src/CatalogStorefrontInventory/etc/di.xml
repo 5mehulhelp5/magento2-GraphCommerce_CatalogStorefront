@@ -35,4 +35,14 @@
     </virtualType>
     <type name="GraphCommerce\CatalogStorefront\Model\Registry\NativeResources"><plugin name="catalog_registry_native_stocks" type="GraphCommerce\CatalogStorefrontInventory\Plugin\Registry\NativeStocks"/></type>
     <type name="GraphCommerce\CatalogStorefront\Model\Registry\Options"><plugin name="catalog_registry_stock_options" type="GraphCommerce\CatalogStorefrontInventory\Plugin\Registry\NativeStocks"/></type>
+    <!-- The stock item settings change in cataloginventory_stock_item, which only the products feed watches. The
+         products feed's indexer is a virtual type, which interception cannot take: the plugin is on the class, and acts
+         for the products feed only. -->
+    <type name="Magento\DataExporter\Model\Indexer\FeedIndexer">
+        <plugin name="graphcommerce_catalog_storefront_queue_stock_of_exported_products" type="GraphCommerce\CatalogStorefrontInventory\Plugin\DataExporter\QueueStockOfExportedProducts" sortOrder="10"/>
+    </type>
+    <!-- MSI recalculates salability after an order in a queue consumer, writing tables the stock feed does not watch. -->
+    <type name="Magento\InventoryIndexer\Model\Queue\UpdateIndexSalabilityStatus">
+        <plugin name="graphcommerce_catalog_storefront_queue_stock_of_salability_changes" type="GraphCommerce\CatalogStorefrontInventory\Plugin\InventoryIndexer\QueueStockOfSalabilityChanges" sortOrder="10"/>
+    </type>
 </config>
