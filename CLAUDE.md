@@ -248,8 +248,10 @@ passes.
   bundle items resolver.
 - `CatalogStorefrontGroupedProduct` / `...GroupedProductGraphQl`: the grouped
   range / the deprecated price rewrite, the grouped items resolver.
-- `CatalogStorefrontDownloadable` / `...DownloadableGraphQl`: the downloadable
-  range registration / the links and samples resolvers.
+- `CatalogStorefrontDownloadable` / `...DownloadableGraphQl` / `...DownloadableFrontend`: the
+  downloadable range registration / the links and samples resolvers / the links and samples of
+  a rendered product page (`getLinks()` and `getSamples()` of the type from `optionsV2` and
+  `samples`, kept in core's memo keys; a link has a sample when the feed gives it an `infoUrl`).
 - `CatalogStorefrontReview` / `...ReviewGraphQl` / `...ReviewFrontend`: the reviews and
   rating feeds made to export like the modern ones, the review date field, the rating
   position and entity, their writers (reviews become documents of their own, declared to the
@@ -308,7 +310,10 @@ passes.
   swatch block's cache key calls before the block cache, so it is paid on
   every render; the lowest price options provider picks the cheapest child by
   final and by regular price from `priceIndex` (per-variant discounts make
-  those different children) and wraps core's provider for the rest. A child's
+  those different children) and wraps core's provider for the rest;
+  `getParentIdsByChild()` answers from the `parentIds` of the page's card and
+  variant documents, which core's identities plugin asks for every simple
+  product a card tags, a query each on every render. A child's
   `entity_id` and a super attribute's `position` are strings, since
   `getJsonConfig()` puts them into the rendered JSON as they are. Without
   the `configurableOptions` field the plugin hands over to core with nothing logged.
